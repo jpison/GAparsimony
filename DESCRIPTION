@@ -1,0 +1,15 @@
+Package: GAparsimony
+Type: Package
+Title: Searching parsimony solutions with GA
+Version: 0.980
+Date: 2017-07-25
+Author: F.J. Martinez-de-Pison
+Maintainer: F.J. Martinez-de-Pison <fjmartin@unirioja.es>
+Description: The proposal combines feature selection, model tuning, and parsimonious model selection with GA. To this objective, a novel GA selection procedure is introduced based on separate cost and complexity evaluations.
+Suggests: parallel, doParallel, doRNG (>= 1.6), knitr (>= 1.8)
+License: GPL (>= 2)
+Depends: R (>= 3.0), methods, foreach, iterators
+Imports: stats, graphics, grDevices, utils
+URL: https://github.com/jpison/GAparsimony
+Repository: CRAN
+NeedsCompilation: no
