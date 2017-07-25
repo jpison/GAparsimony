@@ -14,7 +14,7 @@
 \S4method{plot}{ga_parsimony}(x, general_cex = 0.7, min_ylim=NULL, max_ylim=NULL, iter_auto_ylim=3, 
                               min_iter=NULL, max_iter=NULL, main_label="Boxplot cost evolution", 
                               steps=5, pos_cost_num=-3.1,  pos_feat_num=-1.7,
-                              digits_plot=4, width_plot=12, height_plot=6, ...)
+                              digits_plot=4, width_plot=12, height_plot=6, window=TRUE, ...)
 }
 
 \arguments{
@@ -33,6 +33,7 @@
   \item{digits_plot}{Number of digits to visualize.}
   \item{width_plot}{Figure width in inches.}
   \item{height_plot}{Figure height in inches.}
+  \item{window}{If TRUE shows a new window.}
   
   \item{\dots}{Further arguments, currently not used.}
 }
