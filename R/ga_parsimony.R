@@ -619,7 +619,7 @@ plot.ga_parsimony <- function(x, general_cex = 0.7, min_ylim=NULL, max_ylim=NULL
   #        bty="n")
   mtext(paste0("Results for the best individual:  val.cost (white)=",round(mat_val[1,max_iter],digits_plot),
                ", tst.cost (gray)=",round(mat_tst[1,max_iter],digits_plot),
-               ", complexity=",round(mat_complex[1,max_iter],digits_plot),side=3,line=0,cex=general_cex*1.4))
+               ", complexity=",round(mat_complex[1,max_iter],digits_plot),side=3,line=0,cex=general_cex*1.2))
   return(list(mat_val=mat_val, mat_tst=mat_tst,  mat_complex=mat_complex))
 }
 
