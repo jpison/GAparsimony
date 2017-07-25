@@ -530,10 +530,10 @@ print.summary.ga_parsimony <- function(x, digits = getOption("digits"), ...)
 plot.ga_parsimony <- function(x, general_cex = 0.7, min_ylim=NULL, max_ylim=NULL, 
                               min_iter=NULL, max_iter=NULL, main_label="Boxplot cost evolution", 
                               iter_auto_ylim=3, steps=5, pos_cost_num=-3.1,  pos_feat_num=-1.7,
-                              digits_plot=4, width_plot=12, height_plot=6, ...)
+                              digits_plot=4, width_plot=12, height_plot=6, window=TRUE, ...)
 {
   object <- x
-  x11(width = width_plot, height=height_plot)
+  if (window) x11(width = width_plot, height=height_plot)
   if (length(object@history[[1]])<1) message("'object@history' must be provided!! Set 'keep_history' to TRUE in ga_parsimony() function.")
   if (is.null(min_iter)) min_iter <- 1
   if (is.null(max_iter)) max_iter <- object@iter
