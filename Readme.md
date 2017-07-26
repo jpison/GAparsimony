@@ -71,29 +71,8 @@ for checking the models’ generalization capability.
 ``` {.r}
 # Training and test Datasets
 library(caret)
-```
-
-    ## Loading required package: lattice
-
-    ## Loading required package: ggplot2
-
-    ## Loading required package: withr
-
-``` {.r}
 library(GAparsimony)
-```
-
-    ## Loading required package: foreach
-
-    ## Loading required package: iterators
-
-``` {.r}
 library(mlbench)
-```
-
-    ## Warning: package 'mlbench' was built under R version 3.3.3
-
-``` {.r}
 data(Sonar)
 
 set.seed(1234)
@@ -101,7 +80,6 @@ inTraining <- createDataPartition(Sonar$Class, p=.80, list=FALSE)
 data_train <- Sonar[ inTraining,]
 data_test  <- Sonar[-inTraining,]
 ```
-
 With small databases, it is highly recommended to execute
 **GAparsimony** with a different set of test databases in order to find
 the most important input features and model parameters. In this example,
@@ -111,14 +89,9 @@ Therefore, a robust validation metric will be necessary.
 
 ``` {.r}
 print(dim(data_train))
-```
-
-    ## [1] 167  61
-
-``` {.r}
 print(dim(data_test))
 ```
-
+    ## [1] 167  61
     ## [1] 41 61
 
 In the next step, a fitness function is created, *fitness\_SVM()*.
