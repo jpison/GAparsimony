@@ -595,7 +595,7 @@ plot.ga_parsimony <- function(x, general_cex = 0.7, min_ylim=NULL, max_ylim=NULL
   lines(mat_val[1,],col="black",lty=1,lwd=1.8)
   lines(mat_tst[1,],col="black",lty="dotdash",lwd=1.8)
   
-  title(main=main_label, cex.main=cex=general_cex*1.2)
+  title(main=main_label, cex.main=general_cex*1.2)
   
   # Axis 
   # -----
