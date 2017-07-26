@@ -392,14 +392,10 @@ data_test <- Boston_scaled[-trainIndex,]
 data_train[,ncol(data_train)] <- Boston$medv[trainIndex]
 data_test[,ncol(data_test)] <- Boston$medv[-trainIndex]
 print(dim(data_train))
-```
-
-    ## [1] 407  14
-
-``` {.r}
 print(dim(data_test))
 ```
 
+    ## [1] 407  14
     ## [1] 99 14
 
 Similar to the previous example a fitness function is created,
