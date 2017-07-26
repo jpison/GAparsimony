@@ -116,128 +116,217 @@ Antonanzas-Torres F., Urraca R., Antonanzas J., Fernandez-Ceniceros J., Martinez
 }
 
 \examples{
-# Initial settings
-# ----------------
+ \donttest{
+	#################################
+	### Example 1: Classification ###
+	#################################
 
-# Load Boston database and scale it
-library(MASS)
-Boston <- data.frame(scale(Boston))
+	#This example shows how to search, for the *Sonar* database, a parsimony classification SVM model with 'GAparsimony' and 'caret' packages.
 
-# Define an 80%/20% train/test split of the dataset
-library(caret)
-set.seed(1234)
-trainIndex <- createDataPartition(Boston[,"medv"], p=0.80, list=FALSE)
-data_train <- Boston[trainIndex,]
-data_test <- Boston[-trainIndex,]
+	# Training and testing Datasets
+	library(caret)
+	library(GAparsimony)
+	library(mlbench)
+	data(Sonar)
+
+	set.seed(1234)
+	inTraining <- createDataPartition(Sonar$Class, p=.80, list=FALSE)
+	data_train <- Sonar[ inTraining,]
+	data_test  <- Sonar[-inTraining,]
+
+	# Function to evaluate each SVM individual
+	# ----------------------------------------
+	fitness_SVM <- function(chromosome, ...)
+	{
+	  # First two values in chromosome are 'C' & 'sigma' of 'svmRadial' method
+	  tuneGrid <- data.frame(C=chromosome[1],sigma=chromosome[2])
+	  
+	  # Next values of chromosome are the selected features (TRUE if > 0.50)
+	  selec_feat <- chromosome[3:length(chromosome)]>0.50
+	  
+	  # Return -Inf if there is not selected features
+	  if (sum(selec_feat)<1) return(c(kappa_val=-Inf,kappa_test=-Inf,complexity=Inf))
+	  
+	  # Extract features from the original DB plus response (last column)
+	  data_train_model <- data_train[,c(selec_feat,TRUE)]
+	  data_test_model <- data_test[,c(selec_feat,TRUE)]
+	  
+	  # How to validate each individual
+	  # 'repeats' could be increased to obtain a more robust validation metric. Also,
+	  # 'number' of folds could be adjusted to improve the measure.
+	  train_control <- trainControl(method = "repeatedcv",number = 10,repeats = 10)
+	  
+	  # train the model
+	  set.seed(1234)
+	  model <- train(Class ~ ., data=data_train_model, trControl=train_control, 
+					 method="svmRadial", tuneGrid=tuneGrid, verbose=F)
+	  
+	  # Extract kappa statistics (repeated k-fold CV and testing kappa)
+	  kappa_val <- model$results$Kappa
+	  kappa_test <- postResample(pred=predict(model, data_test_model),
+								 obs=data_test_model[,ncol(data_test_model)])[2]
+	  # Obtain Complexity = Num_Features*1E6+Number of support vectors
+	  complexity <- sum(selec_feat)*1E6+model$finalModel@nSV 
+	  
+	  # Return(-validation error, -testing error, model_complexity)
+	  vect_errors <- c(kappa_val=kappa_val,kappa_test=kappa_test,complexity=complexity)
+	  return(vect_errors)
+	}
+
+	# ---------------------------------------------------------------------------------
+	# Search the best parsimonious model with GA-PARSIMONY by using Feature Selection,
+	# Parameter Tuning and Parsimonious Model Selection
+	# ---------------------------------------------------------------------------------
+	library(GAparsimony)
+
+	# Ranges of size and decay
+	min_param <- c(00.0001, 0.00001)
+	max_param <- c(99.9999, 0.99999)
+	names_param <- c("C","sigma")
+
+	# ga_parsimony can be executed with a different set of 'rerank_error' values
+	rerank_error <- 0.001
 
 
-# Use a Repeated 3x5-fold Cross Validation to have a robust validation RMSE
-set.seed(1234)
-train_control <- trainControl(method="repeatedcv", number=5, repeats=3)
+	# 40 individuals per population, 100 max generations with an early stopping of 10 generations
+	# (8 minutes with 8 cores)!!!!!
+	GAparsimony_model <- ga_parsimony(fitness=fitness_SVM,
+									  min_param=min_param, 
+									  max_param=max_param,
+									  names_param=names_param,
+									  nFeatures=ncol(data_train)-1,
+									  names_features=colnames(data_train)[-ncol(data_train)],
+									  keep_history = TRUE, 
+									  rerank_error = rerank_error,
+									  popSize = 40, 
+									  maxiter = 100, 
+									  early_stop=10,
+									  feat_thres=0.90, # Perc selected features in first generation
+									  feat_mut_thres=0.10, # Prob of a feature to be one in mutation
+									  parallel = TRUE, seed_ini = 1234)
 
-# Function to evaluate each ANN individual
-# ----------------------------------------
-fitness_NNET <- function(chromosome, ...)
-{
-  # First two values in chromosome are 'size' & 'decay' of 'nnet' method
-  tuneGrid <- data.frame(size=round(chromosome[1]),decay=chromosome[2])
-  
-  # Next values of chromosome are the selected features (TRUE if > 0.50)
-  selec_feat <- chromosome[3:length(chromosome)]>0.50
-  if (sum(selec_feat)<1) return(c(rmse_val=-Inf,rmse_test=-Inf,complexity=Inf))
-  
-  # Extract features from the original DB plus response (last column)
-  data_train_model <- data_train[,c(selec_feat,TRUE)]
-  data_test_model <- data_test[,c(selec_feat,TRUE)]
-  
-  # train the model
-  set.seed(1234)
-  model <- train(medv ~ ., data=data_train_model, trControl=train_control, 
-					method="nnet", tuneGrid=tuneGrid, trace=F, linout = 1)
-  
-  # Extract errors
-  rmse_val <- model$results$RMSE
-  rmse_test <- sqrt(mean((unlist(predict(model$finalModel, newdata = data_test_model)) - data_test_model$medv)^2))
-  # Obtain Complexity = Num_Features*10E6+sum(neural_weights^2)
-  complexity <- sum(selec_feat)*10E6+sum(model$finalModel$wts*model$finalModel$wts)  
-  
-  # Return(-validation error, -testing error, model_complexity)
-  vect_errors <- c(rmse_val=-rmse_val,rmse_test=-rmse_test,complexity=complexity)
-  return(vect_errors)
+	print(paste0("Best Parsimonious SVM with C=",GAparsimony_model@bestsolution['C'],
+				 " sigma=", GAparsimony_model@bestsolution['sigma'], " -> ",
+				 " KappaVal=",round(GAparsimony_model@bestsolution['fitnessVal'],6),
+				 " KappaTst=",round(GAparsimony_model@bestsolution['fitnessTst'],6),
+				 " Num Features=",round(GAparsimony_model@bestsolution['complexity']/1E6,0),
+				 " Complexity=",round(GAparsimony_model@bestsolution['complexity'],2)))
+
+	print(summary(GAparsimony_model))
+
+	# Plot GA evolution ('keep_history' must be TRUE)
+	elitists <- plot(GAparsimony_model)
+
+	# Percentage of appearance of each feature in elitists
+	print(parsimony_importance(GAparsimony_model))
+
+
+
+
+	#############################
+	### Example 2: Regression ###
+	#############################
+
+	# This example shows how to search, for the *Boston* database, a parsimony regressor ANN model with 'GAparsimony' and 'caret' packages.
+
+	# Load Boston database and scale it
+	library(MASS)
+	data(Boston)
+	Boston_scaled <- data.frame(scale(Boston))
+
+	# Define an 80%/20% train/test split of the dataset
+	set.seed(1234)
+	trainIndex <- createDataPartition(Boston[,"medv"], p=0.80, list=FALSE)
+	data_train <- Boston_scaled[trainIndex,]
+	data_test <- Boston_scaled[-trainIndex,]
+	# Restore 'Response' to original values
+	data_train[,ncol(data_train)] <- Boston$medv[trainIndex]
+	data_test[,ncol(data_test)] <- Boston$medv[-trainIndex]
+	print(dim(data_train))
+	print(dim(data_test))
+
+
+	# Function to evaluate each ANN individual
+	# ----------------------------------------
+	fitness_NNET <- function(chromosome, ...)
+	{
+	  # First two values in chromosome are 'size' & 'decay' of 'nnet' method
+	  tuneGrid <- data.frame(size=round(chromosome[1]),decay=chromosome[2])
+	  
+	  # Next values of chromosome are the selected features (TRUE if > 0.50)
+	  selec_feat <- chromosome[3:length(chromosome)]>0.50
+	  if (sum(selec_feat)<1) return(c(rmse_val=-Inf,rmse_test=-Inf,complexity=Inf))
+	  
+	  # Extract features from the original DB plus response (last column)
+	  data_train_model <- data_train[,c(selec_feat,TRUE)]
+	  data_test_model <- data_test[,c(selec_feat,TRUE)]
+	  
+	  # How to validate each individual
+	  # 'repeats' could be increased to obtain a more robust validation metric. Also,
+	  # 'number' of folds could be adjusted to improve the measure.
+	  train_control <- trainControl(method = "repeatedcv",number = 10,repeats = 5)
+	  
+	  # train the model
+	  set.seed(1234)
+	  model <- train(medv ~ ., data=data_train_model, trControl=train_control, 
+					 method="nnet", tuneGrid=tuneGrid, trace=F, linout = 1)
+	  
+	  # Extract errors
+	  rmse_val <- model$results$RMSE
+	  rmse_test <- sqrt(mean((unlist(predict(model, newdata = data_test_model)) - data_test_model$medv)^2))
+	  # Obtain Complexity = Num_Features*1E6+sum(neural_weights^2)
+	  complexity <- sum(selec_feat)*1E6+sum(model$finalModel$wts*model$finalModel$wts)  
+	  
+	  # Return(-validation error, -testing error, model_complexity)
+	  # errors are negative because GA-PARSIMONY tries to maximize values
+	  vect_errors <- c(rmse_val=-rmse_val,rmse_test=-rmse_test,complexity=complexity)
+	  return(vect_errors)
+	}
+
+	# ---------------------------------------------------------------------------------
+	# Search the best parsimonious model with GA-PARSIMONY by using Feature Selection,
+	# Parameter Tuning and Parsimonious Model Selection
+	# ---------------------------------------------------------------------------------
+	library(GAparsimony)
+
+	# Ranges of size and decay
+	min_param <- c(1, 0.0001)
+	max_param <- c(25 , 0.9999)
+	names_param <- c("size","decay")
+
+	# ga_parsimony can be executed with a different set of 'rerank_error' values
+	rerank_error <- 0.01  
+
+	# 40 individuals per population, 100 max generations with an early stopping of 10 generations
+	# (8 minutes with 8 cores)!!!!!
+	GAparsimony_model <- ga_parsimony(fitness=fitness_NNET,
+									  min_param=min_param, 
+									  max_param=max_param,
+									  names_param=names_param,
+									  nFeatures=ncol(data_train)-1,
+									  names_features=colnames(data_train)[-ncol(data_train)],
+									  keep_history = TRUE, 
+									  rerank_error = rerank_error,
+									  popSize = 40,
+									  maxiter = 100, # Change to 100
+									  early_stop=10,
+									  feat_thres=0.90, # Perc selected features in first generation
+									  feat_mut_thres=0.10, # Prob of a feature to be one in mutation
+									  not_muted=2,
+									  parallel = TRUE, seed_ini = 1234)
+
+	print(paste0("Best Parsimonious ANN with ",round(GAparsimony_model@bestsolution['size']),
+				 " hidden neurons and decay=", GAparsimony_model@bestsolution['decay'], " -> ",
+				 " RMSEVal=",round(-GAparsimony_model@bestsolution['fitnessVal'],6),
+				 " RMSETst=",round(-GAparsimony_model@bestsolution['fitnessTst'],6)))
+	print(summary(GAparsimony_model))
+
+	# Plot GA evolution ('keep_history' must be TRUE)
+	elitists <- plot(GAparsimony_model)
+
+	# Percentage of appearance of each feature in elitists
+	print(parsimony_importance(GAparsimony_model))
 }
-
-
-# ---------------------------------------------------------------------------------
-# Search the best parsimonious model with GA-PARSIMONY by using Feature Selection,
-# Parameter Tuning and Parsimonious Model Selection
-# ---------------------------------------------------------------------------------
-library(GAparsimony)
-
-# Ranges of size and decay
-min_param <- c(1, 0.0001)
-max_param <- c(25 , 0.9999)
-names_param <- c("size","decay")
-
-# ga_parsimony was executed among a different set of 'rerank_error' values seq(0,0.0030,0.00005)
-rerank_error <- 0.00005   # Selected rerank_error 
-
-
-# Results of the best Parsimonious ANN Model vs a Classical ANN Model
-print("Searching the best parsimonious model with GA-PARSIMONY")
-print("-------------------------------------------------------")
-
-# GA optimization process with 40 individuals per population, 10 max generations with an early stopping of 5 generations
-# (5 minutes with 8 cores)!!!!! Reduce maxiter only to understand the process if it is too computational expensive...
-GAparsimony_model <- ga_parsimony(fitness=fitness_NNET,
-                                  min_param=min_param, 
-                                  max_param=max_param,
-                                  names_param=names_param,
-                                  nFeatures=ncol(data_train)-1,
-                                  names_features=colnames(data_train)[-ncol(data_train)],
-                                  keep_history = TRUE, 
-                                  rerank_error = rerank_error,
-                                  popSize = 40, 
-                                  maxiter = 10, early_stop=5,
-                                  parallel = TRUE, seed_ini = 1234)
-
-print(paste0("Best Parsimonious ANN with ",round(GAparsimony_model@bestsolution['size']),
-             " hidden neurons and decay=", GAparsimony_model@bestsolution['decay'], " -> ",
-             " RMSEVal=",round(-GAparsimony_model@bestsolution['fitnessVal'],6),
-             " RMSETst=",round(-GAparsimony_model@bestsolution['fitnessTst'],6)))
-print(summary(GAparsimony_model))
-
-# Plot GA evolution ('keep_history' must be TRUE)
-plot(GAparsimony_model)
-
-# Percentage of appearance of each feature in elitists
-print(parsimony_importance(GAparsimony_model))
-
-
-# -----------------------------------------------------------
-# Compare results with the best ANN obtained with Grid Search
-# -----------------------------------------------------------
-
-print("Searching the best model with Grid Search")
-print("-----------------------------------------")
-
-# Grid to obtain the best 'size' and 'decay' parameters with classical grid search
-# CAUTION: Computationally expensive!
-library(caret)
-#my.grid <- expand.grid(.decay = 0.16, .size = 21)
-my.grid <- expand.grid(.decay = seq(0.01,1.0,0.05), .size = seq(1,30,2))
-# Uncomment to use parallelisation
-# library(doMC)
-# registerDoMC(cores = 8)
-set.seed(1234)
-model_grid <- train(medv ~ ., data = data_train, trControl=train_control,
-                    method = "nnet", maxit = 1000, tuneGrid = my.grid, trace = F, linout = 1) 
-# Results with single ANN Model
-print(paste0("Best ANN with ",model_grid$bestTune$size, 
-             " hidden neurons and decay=", model_grid$bestTune$decay,
-             " RMSEVal=",round(min(model_grid$results$RMSE),6),
-             " RMSETst=",round(sqrt(mean((unlist(predict(model_grid, newdata=data_test))-data_test$medv)^2)),6)))
-			 
-			 
 			 
 }
 
