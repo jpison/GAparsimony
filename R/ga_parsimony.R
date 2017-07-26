@@ -582,7 +582,7 @@ plot.ga_parsimony <- function(x, general_cex = 0.7, min_ylim=NULL, max_ylim=NULL
   if (is.null(max_ylim)) max_ylim <- max(c(mat_val,mat_tst),na.rm=TRUE)
   
   
-  boxplot(mat_val, main=main_label,
+  boxplot(mat_val,
           col="white", xlim=c(min_iter-1,max_iter), ylim=c(min_ylim,max_ylim), 
           xaxt = "n", xlab = "", ylab = "", border=T, axes=F,outline=F,
           medlwd=0.75, pars=list(yaxt="n",xaxt="n", xlab = "", ylab = "", 
@@ -594,6 +594,8 @@ plot.ga_parsimony <- function(x, general_cex = 0.7, min_ylim=NULL, max_ylim=NULL
   
   lines(mat_val[1,],col="black",lty=1,lwd=1.8)
   lines(mat_tst[1,],col="black",lty="dotdash",lwd=1.8)
+  
+  title(main=main_label, cex.main=cex=general_cex*1.2)
   
   # Axis 
   # -----
