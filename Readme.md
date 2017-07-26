@@ -29,8 +29,32 @@ Or the development version from GitHub:
 devtools::install_github("jpison/GAparsimony")
 ```
 
-    ## Skipping install of 'GAparsimony' from a github remote, the SHA1 (211d3933) has not changed since last install.
-    ##   Use `force = TRUE` to force installation
+References
+----------
+
+Sanz-Garcia A., Fernandez-Ceniceros J., Antonanzas-Torres F.,
+Pernia-Espinoza A.V., Martinez-de-Pison F.J. (2015). GA-PARSIMONY: A
+GA-SVR approach with feature selection and parameter optimization to
+obtain parsimonious solutions for predicting temperature settings in a
+continuous annealing furnace. Applied Soft Computing 35, 23-38.
+
+Urraca R., Sodupe-Ortega E., Antonanzas E., Antonanzas-Torres F.,
+Martinez-de-Pison, F.J. (2017). Evaluation of a novel GA-based
+methodology for model structure selection: The GA-PARSIMONY.
+Neurocomputing, Online July 2017.
+[https://doi.org/10.1016/j.neucom.2016.08.154](https://doi.org/10.1016/j.neucom.2016.08.154)
+
+Fernandez-Ceniceros J., Sanz-Garcia A., Antonanzas-Torres F.,
+Martinez-de-Pison F.J. (2015). A numerical-informational approach for
+characterising the ductile behaviour of the T-stub component. Part 2:
+Parsimonious soft-computing-based metamodel. Engineering Structures 82,
+249-260.
+
+Antonanzas-Torres F., Urraca R., Antonanzas J., Fernandez-Ceniceros J.,
+Martinez-de-Pison F.J. (2015). Generation of daily global solar
+irradiation with support vector machines for regression. Energy
+Conversion and Management 96, 277-286.
+
 
 How to use this package
 -----------------------
@@ -335,6 +359,12 @@ print(summary(GAparsimony_model))
 
 Plot GA evolution.
 
+```{r fig.cap = "GA-PARSIMONY evolution", echo=FALSE}
+# Plot GA evolution ('keep_history' must be TRUE)
+elitists <- plot(GAparsimony_model, window=FALSE, general_cex=0.6, pos_cost_num=-1, pos_feat_num=-1, digits_plot=3)
+```
+
+
 ![GA-PARSIMONY Evolution](https://github.com/jpison/GAparsimony/blob/master/images/classification.png)
 
 GA-PARSIMONY evolution
@@ -596,28 +626,3 @@ print(parsimony_importance(GAparsimony_model))
     ##       chas 
     ##   5.416667
 
-References
-----------
-
-Sanz-Garcia A., Fernandez-Ceniceros J., Antonanzas-Torres F.,
-Pernia-Espinoza A.V., Martinez-de-Pison F.J. (2015). GA-PARSIMONY: A
-GA-SVR approach with feature selection and parameter optimization to
-obtain parsimonious solutions for predicting temperature settings in a
-continuous annealing furnace. Applied Soft Computing 35, 23-38.
-
-Urraca R., Sodupe-Ortega E., Antonanzas E., Antonanzas-Torres F.,
-Martinez-de-Pison, F.J. (2017). Evaluation of a novel GA-based
-methodology for model structure selection: The GA-PARSIMONY.
-Neurocomputing, Online July 2017.
-[https://doi.org/10.1016/j.neucom.2016.08.154](https://doi.org/10.1016/j.neucom.2016.08.154)
-
-Fernandez-Ceniceros J., Sanz-Garcia A., Antonanzas-Torres F.,
-Martinez-de-Pison F.J. (2015). A numerical-informational approach for
-characterising the ductile behaviour of the T-stub component. Part 2:
-Parsimonious soft-computing-based metamodel. Engineering Structures 82,
-249-260.
-
-Antonanzas-Torres F., Urraca R., Antonanzas J., Fernandez-Ceniceros J.,
-Martinez-de-Pison F.J. (2015). Generation of daily global solar
-irradiation with support vector machines for regression. Energy
-Conversion and Management 96, 277-286.
