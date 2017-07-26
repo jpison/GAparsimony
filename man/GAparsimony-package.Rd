@@ -10,7 +10,7 @@ Combines feature selection, model tuning, and parsimonious model selection with 
 }
 
 \details{
-\pkg{GAparsimony} package is a new GA wrapper automatic procedure that efficiently generated prediction models with reduced complexity and adequate generalization capacity. 
+\pkg{GAparsimony} package is a new GA wrapper automatic method that efficiently generated prediction models with reduced complexity and adequate generalization capacity. 
 \code{ga_parsimony} function is primarily based on combining feature selection and model parameter tuning with a second novel GA selection process (ReRank algorithm) in order to achieve better overall parsimonious models. 
 Unlike other GA methodologies that use a penalty parameter for combining loss and complexity measures into a unique fitness function, the main contribution of this package is that \code{ga_parsimony} selects the best models by considering cost and complexity separately. For this purpose, the ReRank algorithm rearranges individuals by their complexity when there is not a significant difference between their costs. Thus, less complex models with similar accuracy are promoted. Furthermore, because the penalty parameter is unnecessary, there is no consequent uncertainty associated with assigning a correct value beforehand. As a result, with GA-PARSIMONY, an automatic method for obtaining parsimonious models is finally made possible.
 }
