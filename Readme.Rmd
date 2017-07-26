@@ -1,0 +1,334 @@
+---
+title: "GAparsimony"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+GAparsimony R package is a GA-based optimization method for searching accurate parsimonious models by combining feature selection (FS), model hyperparameter optimization (HO), and parsimonious model selection (PMS).
+
+PMS is based on separate cost and complexity evaluations. The best individuals are initially sorted by an error fitness function, and afterwards, models with similar costs are rearranged according to model complexity measurement so as to foster models of lesser complexity. The algorithm can be run sequentially or in parallel using an explicit master-slave parallelization.
+
+## Installation
+
+Get the released version from CRAN:
+
+```{r}
+install.packages("GAparsimony")
+```
+
+Or the development version from GitHub:
+```{r}
+# install.packages("devtools")
+devtools::install_github("jpison/GAparsimony")
+```
+
+## How to use this package
+
+### Example 1: Classification
+
+This example shows how to search, for the *Sonar* database, a parsimony classification SVM model with **GAparsimony** and **caret** packages.
+
+First, we create a 80% of database for searching the model and the remaining 20% for the test database. The test database will be only used for checking the models' generalization capability. 
+
+
+
+
+```{r}
+# Training and test Datasets
+library(caret)
+library(GAparsimony)
+library(mlbench)
+data(Sonar)
+
+set.seed(1234)
+inTraining <- createDataPartition(Sonar$Class, p=.80, list=FALSE)
+data_train <- Sonar[ inTraining,]
+data_test  <- Sonar[-inTraining,]
+
+
+```
+
+With small databases, it is highly recommended to execute **GAparsimony** with a different set of test databases in order to find the most important input features and model parameters. In this example, one iteration is showed with a training database composed of 60 input features and 167 instances, and a test database with only 41 instances. Therefore, a robust validation metric will be necessary.
+
+```{r}
+print(dim(data_train))
+print(dim(data_test))
+```
+
+In the next step, a fitness function is created, *fitness_SVM()*. 
+
+This function extracts **C** and **sigma** SVM parameters from the first two elements of *chromosome* vector. Next 60 elements of chromosome correspond with the selected input features, *selec_feat*. They are binarized to one when they are one greater than > 0.50.
+
+A SVM model is trained with these parameters and selected input features. Finally, *fitness_SVM()* returns a vector with three values: the kappa statistic obtained with a 10 repeats of a 10-fold cross-validation process, the kappa measured with the test database to check the model generalization capability, and the model complexity.
+
+In this example, the model complexity combines the number of features multiplied by 1E6 plus the number of support vectors in the selected model. Therefore, PMS considers the most parsimonious model with the lower number of features. Between two models with the same number of features, the lower number of support vectors will determine the most parsimonious model.
+
+However, other parsimonious metrics could be considered in future applications.
+
+
+
+```{r}
+
+# Function to evaluate each SVM individual
+# ----------------------------------------
+fitness_SVM <- function(chromosome, ...)
+{
+  # First two values in chromosome are 'C' & 'sigma' of 'svmRadial' method
+  tuneGrid <- data.frame(C=chromosome[1],sigma=chromosome[2])
+  
+  # Next values of chromosome are the selected features (TRUE if > 0.50)
+  selec_feat <- chromosome[3:length(chromosome)]>0.50
+  
+  # Return -Inf if there is not selected features
+  if (sum(selec_feat)<1) return(c(kappa_val=-Inf,kappa_test=-Inf,complexity=Inf))
+  
+  # Extract features from the original DB plus response (last column)
+  data_train_model <- data_train[,c(selec_feat,TRUE)]
+  data_test_model <- data_test[,c(selec_feat,TRUE)]
+  
+  # How to validate each individual
+  # 'repeats' could be increased to obtain a more robust validation metric. Also,
+  # 'number' of folds could be adjusted to improve the measure.
+  train_control <- trainControl(method = "repeatedcv",number = 10,repeats = 10)
+
+  # train the model
+  set.seed(1234)
+  model <- train(Class ~ ., data=data_train_model, trControl=train_control, 
+                 method="svmRadial", tuneGrid=tuneGrid, verbose=F)
+
+  # Extract kappa statistics (repeated k-fold CV and testing kappa)
+  kappa_val <- model$results$Kappa
+  kappa_test <- postResample(pred=predict(model, data_test_model),
+                                obs=data_test_model[,ncol(data_test_model)])[2]
+  # Obtain Complexity = Num_Features*1E6+Number of support vectors
+  complexity <- sum(selec_feat)*1E6+model$finalModel@nSV 
+  
+  # Return(-validation error, -testing error, model_complexity)
+  vect_errors <- c(kappa_val=kappa_val,kappa_test=kappa_test,complexity=complexity)
+  return(vect_errors)
+}
+
+```
+
+The GA-PARSIMONY process begins defining the range of the SVM parameters and their names. Also, *rerank_error* can be tuned with different *ga_parsimony* runs to improve the **model generalization capability**. In this example, *rerank_error* has been fixed to 0.001 but other values could improve the trade-off between model complexity and model accuracy.
+
+
+```{r}
+# ---------------------------------------------------------------------------------
+# Search the best parsimonious model with GA-PARSIMONY by using Feature Selection,
+# Parameter Tuning and Parsimonious Model Selection
+# ---------------------------------------------------------------------------------
+library(GAparsimony)
+
+# Ranges of size and decay
+min_param <- c(00.0001, 0.00001)
+max_param <- c(99.9999, 0.99999)
+names_param <- c("C","sigma")
+
+# ga_parsimony can be executed with a different set of 'rerank_error' values
+rerank_error <- 0.001
+```
+
+Starts the GA optimizaton process with 40 individuals per generation and a maximum number of 100 iterations with an early stopping when validation measure does not increase significantly in 10 generations. Parallel is activated. In addition, history of each iteration is saved in order to use *plot* and *parsimony_importance* methods.
+
+```{r}
+# GA optimization process with 40 individuals per population, 100 max generations with an early stopping of 10 generations
+# (8 minutes with 8 cores)!!!!! Reduce maxiter to understand the process if it is too computational expensive...
+GAparsimony_model <- ga_parsimony(fitness=fitness_SVM,
+                                  min_param=min_param, 
+                                  max_param=max_param,
+                                  names_param=names_param,
+                                  nFeatures=ncol(data_train)-1,
+                                  names_features=colnames(data_train)[-ncol(data_train)],
+                                  keep_history = TRUE, 
+                                  rerank_error = rerank_error,
+                                  popSize = 40, 
+                                  maxiter = 100, early_stop=10,
+                                  feat_thres=0.90, # Perc selected features in first generation
+                                  feat_mut_thres=0.10, # Prob of a feature to be one in mutation
+                                  parallel = TRUE, seed_ini = 1234)
+
+```
+
+Show the results of the best parsimonious model. We can see similar validation and testing kappas.
+
+```{r}
+print(paste0("Best Parsimonious SVM with C=",GAparsimony_model@bestsolution['C'],
+             " sigma=", GAparsimony_model@bestsolution['sigma'], " -> ",
+             " KappaVal=",round(GAparsimony_model@bestsolution['fitnessVal'],6),
+             " KappaTst=",round(GAparsimony_model@bestsolution['fitnessTst'],6),
+             " Num Features=",round(GAparsimony_model@bestsolution['complexity']/1E6,0),
+             " Complexity=",round(GAparsimony_model@bestsolution['complexity'],2)))
+
+print(summary(GAparsimony_model))
+```
+
+
+Plot GA evolution.
+
+```{r fig.cap = "GA-PARSIMONY evolution", echo=FALSE}
+# Plot GA evolution ('keep_history' must be TRUE)
+elitists <- plot(GAparsimony_model, window=FALSE, general_cex=0.6, pos_cost_num=-1, pos_feat_num=-1, digits_plot=3)
+```
+
+
+Show percentage of appearance of each feature in elitists
+
+```{r}
+# Percentage of appearance of each feature in elitists
+print(parsimony_importance(GAparsimony_model))
+```
+
+
+
+### Example 2: Regression
+
+This example shows how to search, for the *Boston* database, a parsimony regressor ANN model with **GAparsimony** and **caret** packages.
+
+First, we create a 80% of database for searching the model and the remaining 20% for the test database. The test database will be only used for checking the models' generalization capability. 
+
+
+
+```{r}
+# Load Boston database and scale it
+library(MASS)
+data(Boston)
+Boston_scaled <- data.frame(scale(Boston))
+
+# Define an 80%/20% train/test split of the dataset
+set.seed(1234)
+trainIndex <- createDataPartition(Boston[,"medv"], p=0.80, list=FALSE)
+data_train <- Boston_scaled[trainIndex,]
+data_test <- Boston_scaled[-trainIndex,]
+# Restore 'Response' to original values
+data_train[,ncol(data_train)] <- Boston$medv[trainIndex]
+data_test[,ncol(data_test)] <- Boston$medv[-trainIndex]
+print(dim(data_train))
+print(dim(data_test))
+
+```
+
+Similar to the previous example a fitness function is created, *fitness_NNET()*. 
+
+This function extracts **size** and **decay** NNET parameters from the first two elements of *chromosome* vector. Next 13 elements of chromosome correspond with the selected input features, *selec_feat*. They are binarized to one when they are one greater than > 0.50.
+
+A NNET model is trained with these parameters and selected input features. Finally, *fitness_NNET()* returns a vector with three values: the negative RMSE obtained with a 5 repeats of a 10-fold cross-validation process, the negative RMSE measured with the test database to check the model generalization capability, and the model complexity. Negative values of RMSE are returned because *ga_parsimony* **maximizes** the validation cost,
+
+In this example, the model complexity combines the number of features multiplied by 1E6 plus the sum of the squared network weights. Therefore, PMS considers the most parsimonious model with the lower number of features. Between two models with the same number of features, the lower sum of the squared network weights will determine the most parsimonious model.
+
+However, other parsimonious metrics could be considered in future applications.
+
+```{r}
+# Function to evaluate each ANN individual
+# ----------------------------------------
+fitness_NNET <- function(chromosome, ...)
+{
+  # First two values in chromosome are 'size' & 'decay' of 'nnet' method
+  tuneGrid <- data.frame(size=round(chromosome[1]),decay=chromosome[2])
+  
+  # Next values of chromosome are the selected features (TRUE if > 0.50)
+  selec_feat <- chromosome[3:length(chromosome)]>0.50
+  if (sum(selec_feat)<1) return(c(rmse_val=-Inf,rmse_test=-Inf,complexity=Inf))
+  
+  # Extract features from the original DB plus response (last column)
+  data_train_model <- data_train[,c(selec_feat,TRUE)]
+  data_test_model <- data_test[,c(selec_feat,TRUE)]
+  
+  # How to validate each individual
+  # 'repeats' could be increased to obtain a more robust validation metric. Also,
+  # 'number' of folds could be adjusted to improve the measure.
+  train_control <- trainControl(method = "repeatedcv",number = 10,repeats = 5)
+  
+  # train the model
+  set.seed(1234)
+  model <- train(medv ~ ., data=data_train_model, trControl=train_control, 
+                 method="nnet", tuneGrid=tuneGrid, trace=F, linout = 1)
+  
+  # Extract errors
+  rmse_val <- model$results$RMSE
+  rmse_test <- sqrt(mean((unlist(predict(model, newdata = data_test_model)) - data_test_model$medv)^2))
+  # Obtain Complexity = Num_Features*1E6+sum(neural_weights^2)
+  complexity <- sum(selec_feat)*1E6+sum(model$finalModel$wts*model$finalModel$wts)  
+  
+  # Return(-validation error, -testing error, model_complexity)
+  # errors are negative because GA-PARSIMONY tries to maximize values
+  vect_errors <- c(rmse_val=-rmse_val,rmse_test=-rmse_test,complexity=complexity)
+  return(vect_errors)
+}
+```
+
+
+Initial settings.
+
+```{r}
+
+# ---------------------------------------------------------------------------------
+# Search the best parsimonious model with GA-PARSIMONY by using Feature Selection,
+# Parameter Tuning and Parsimonious Model Selection
+# ---------------------------------------------------------------------------------
+library(GAparsimony)
+
+# Ranges of size and decay
+min_param <- c(1, 0.0001)
+max_param <- c(25 , 0.9999)
+names_param <- c("size","decay")
+
+# ga_parsimony can be executed with a different set of 'rerank_error' values
+rerank_error <- 0.01  
+
+```
+
+Search the best parsimonious model.
+
+
+```{r}
+# GA optimization process with 40 individuals per population, 100 max generations with an early stopping of 10 generations
+# (34 minutes with 8 cores)!!!!! Reduce maxiter to understand the process if it is too computational expensive...
+GAparsimony_model <- ga_parsimony(fitness=fitness_NNET,
+                                  min_param=min_param, 
+                                  max_param=max_param,
+                                  names_param=names_param,
+                                  nFeatures=ncol(data_train)-1,
+                                  names_features=colnames(data_train)[-ncol(data_train)],
+                                  keep_history = TRUE, 
+                                  rerank_error = rerank_error,
+                                  popSize = 40, 
+                                  maxiter = 100, early_stop=10,
+                                  feat_thres=0.90, # Perc selected features in first generation
+                                  feat_mut_thres=0.10, # Prob of a feature to be one in mutation
+                                  not_muted=2,
+                                  parallel = TRUE, seed_ini = 1234)
+
+print(paste0("Best Parsimonious ANN with ",round(GAparsimony_model@bestsolution['size']),
+             " hidden neurons and decay=", GAparsimony_model@bestsolution['decay'], " -> ",
+             " RMSEVal=",round(-GAparsimony_model@bestsolution['fitnessVal'],6),
+             " RMSETst=",round(-GAparsimony_model@bestsolution['fitnessTst'],6)))
+print(summary(GAparsimony_model))
+```
+
+Plot GA evolution.
+
+```{r fig.cap = "GA-PARSIMONY evolution", echo=FALSE}
+# Plot GA evolution ('keep_history' must be TRUE)
+elitists <- plot(GAparsimony_model, window=FALSE, general_cex=0.6, pos_cost_num=-1, pos_feat_num=-1, digits_plot=3)
+```
+
+Show percentage of appearance of each feature in elitists
+
+```{r}
+# Percentage of appearance of each feature in elitists
+print(parsimony_importance(GAparsimony_model))
+```
+
+
+
+## References
+
+Sanz-Garcia A., Fernandez-Ceniceros J., Antonanzas-Torres F., Pernia-Espinoza A.V., Martinez-de-Pison F.J. (2015). GA-PARSIMONY: A GA-SVR approach with feature selection and parameter optimization to obtain parsimonious solutions for predicting temperature settings in a continuous annealing furnace. Applied Soft Computing 35, 23-38.
+
+Urraca R., Sodupe-Ortega E., Antonanzas E., Antonanzas-Torres F., Martinez-de-Pison, F.J. (2017). Evaluation of a novel GA-based methodology for model structure selection: The GA-PARSIMONY. Neurocomputing, Online July 2017. https://doi.org/10.1016/j.neucom.2016.08.154
+
+Fernandez-Ceniceros J., Sanz-Garcia A., Antonanzas-Torres F., Martinez-de-Pison F.J. (2015). A numerical-informational approach for characterising the ductile behaviour of the T-stub component. Part 2: Parsimonious soft-computing-based metamodel. Engineering Structures 82, 249-260.
+
+Antonanzas-Torres F., Urraca R., Antonanzas J., Fernandez-Ceniceros J., Martinez-de-Pison F.J. (2015). Generation of daily global solar irradiation with support vector machines for regression. Energy Conversion and Management 96, 277-286.
