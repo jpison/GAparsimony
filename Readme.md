@@ -189,7 +189,7 @@ in order to use *plot* and *parsimony\_importance* methods.
 
 ``` {.r}
 # GA optimization process with 40 individuals per population, 100 max generations with an early stopping of 10 generations
-# (8 minutes with 8 cores)!!!!! Reduce maxiter to understand the process if it is too computational expensive...
+# (CAUTION! 7.34 minutes with 8 cores)!!!!! Reduce maxiter to understand the process if it is too computational expensive...
 GAparsimony_model <- ga_parsimony(fitness=fitness_SVM,
                                   min_param=min_param,
                                   max_param=max_param,
@@ -485,7 +485,7 @@ Search the best parsimonious model.
 
 ``` {.r}
 # GA optimization process with 40 individuals per population, 100 max generations with an early stopping of 10 generations
-# (34 minutes with 8 cores)!!!!! Reduce maxiter to understand the process if it is too computational expensive...
+# (CAUTION!! 34 minutes with 8 cores)!!!!! Reduce maxiter to understand the process if it is too computational expensive...
 GAparsimony_model <- ga_parsimony(fitness=fitness_NNET,
                                   min_param=min_param,
                                   max_param=max_param,
