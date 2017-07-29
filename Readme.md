@@ -16,7 +16,7 @@ master-slave parallelization.
 Installation
 ------------
 
-Get the released version from CRAN:
+Get the released version from CRAN (soon):
 
 ``` {.r}
 #install.packages("GAparsimony")
