@@ -533,7 +533,7 @@ plot.ga_parsimony <- function(x, general_cex = 0.7, min_ylim=NULL, max_ylim=NULL
                               digits_plot=4, width_plot=12, height_plot=6, window=TRUE, ...)
 {
   object <- x
-  if (window) x11(width = width_plot, height=height_plot)
+  if (window) dev.new(1,width = width_plot, height = height_plot)
   if (length(object@history[[1]])<1) message("'object@history' must be provided!! Set 'keep_history' to TRUE in ga_parsimony() function.")
   if (is.null(min_iter)) min_iter <- 1
   if (is.null(max_iter)) max_iter <- object@iter

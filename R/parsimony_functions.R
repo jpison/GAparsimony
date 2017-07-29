@@ -94,7 +94,7 @@ parsimony_importance <- function(object, verbose=FALSE, ...)
   features_hist <- NULL
   for (iter in min_iter:max_iter)
   {
-    features_hist <- rbind(features_hist, object@history[[iter]]$population[1:nelitistm,-c(1:GAparsimony_model@nParams)])
+    features_hist <- rbind(features_hist, object@history[[iter]]$population[1:nelitistm,-c(1:object@nParams)])
   }
   importance <- apply(features_hist,2,mean)
   names(importance) <- object@names_features
@@ -118,13 +118,12 @@ parsimony_importance <- function(object, verbose=FALSE, ...)
 ################################################################
 parsimony_population <- function(object, type_ini_pop="randomLHS", ...)
 {
-  if (!exists("lhs")) library(lhs);
   nvars <- object@nParams+object@nFeatures
-  if (type_ini_pop=="randomLHS") population <- randomLHS(object@popSize,nvars)
-  if (type_ini_pop=="geneticLHS") population <- geneticLHS(object@popSize,nvars)
-  if (type_ini_pop=="improvedLHS") population <- improvedLHS(object@popSize,nvars)
-  if (type_ini_pop=="maximinLHS") population <- maximinLHS(object@popSize,nvars)
-  if (type_ini_pop=="optimumLHS") population <- optimumLHS(object@popSize,nvars)
+  if (type_ini_pop=="randomLHS") population <- lhs::randomLHS(object@popSize,nvars)
+  if (type_ini_pop=="geneticLHS") population <- lhs::geneticLHS(object@popSize,nvars)
+  if (type_ini_pop=="improvedLHS") population <- lhs::improvedLHS(object@popSize,nvars)
+  if (type_ini_pop=="maximinLHS") population <- lhs::maximinLHS(object@popSize,nvars)
+  if (type_ini_pop=="optimumLHS") population <- lhs::optimumLHS(object@popSize,nvars)
   if (type_ini_pop=="random") population <- matrix(runif(object@popSize*nvars,object@popSize,nvars))
   
   # Scale matrix with the parameters range
