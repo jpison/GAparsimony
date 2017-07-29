@@ -1,0 +1,14 @@
+import("stats", "graphics", "methods", "foreach", "iterators")
+importFrom("grDevices", "adjustcolor", "colorRampPalette", "dev.new")
+importFrom("utils", "str", "flush.console", "head")
+  
+export("ga_parsimony", "parsimony_control", "parsimony_monitor", "parsimony_summary","parsimony_rerank","parsimony_importance")
+
+exportClasses("ga_parsimony")
+exportMethods("print", "show", "summary", "plot")
+
+S3method("plot", "ga_parsimony")
+S3method("summary", "ga_parsimony")
+S3method("print", "summary.ga_parsimony")
+
+exportPattern("^[^\\.]")
