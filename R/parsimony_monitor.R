@@ -12,11 +12,11 @@ parsimony_monitor <- function(object, digits = getOption("digits"), ...)
   sumryStat <- format(sumryStat, digits = digits)
   
   
-  if (Sys.getenv("RSTUDIO") == "1")
-  {
-    cat(paste0(rep("\b", getOption("width")), collapse = ""))
-    flush.console()
-  }
+#  if (Sys.getenv("RSTUDIO") == "1")
+#  {
+#    cat(paste0(rep("\b", getOption("width")), collapse = ""))
+#    flush.console()
+#  }
   
   cat(paste("\rGA-PARSIMONY | iter =", object@iter, "\n")) 
   cat(paste("MeanVal =", sumryStat[1], 
