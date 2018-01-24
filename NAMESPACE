@@ -1,4 +1,4 @@
-import("stats", "graphics", "methods", "foreach", "iterators")
+import("stats", "graphics", "methods", "foreach", "doParallel", "iterators")
 importFrom("grDevices", "adjustcolor", "colorRampPalette", "dev.new")
 importFrom("utils", "str", "flush.console", "head")
   
