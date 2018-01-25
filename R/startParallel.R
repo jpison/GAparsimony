@@ -72,7 +72,7 @@ startParallel <- function(parallel = TRUE, ...)
       }
       else if(parallelType == "multicore")
         { # multicore functionality on Unix-like systems
-          cl <- parallel::makeCluster(numCores, type = "FORK")
+          cl <- parallel::makeCluster(numCores)
           doParallel::registerDoParallel(cl, cores = numCores) 
           attr(parallel, "cluster") <- cl
         }
@@ -86,7 +86,7 @@ startParallel <- function(parallel = TRUE, ...)
                
 stopParallel <- function(cluster, ...)
 { 
-# Stop parallel computing for GA package
+# Stop parallel computing for GAPARSIMONY package
   parallel::stopCluster(cluster)
   foreach::registerDoSEQ()
   invisible()
