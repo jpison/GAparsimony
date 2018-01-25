@@ -73,8 +73,25 @@ startParallel <- function(parallel = TRUE, ...)
       else if(parallelType == "multicore")
         { # multicore functionality on Unix-like systems
           cl <- parallel::makeCluster(numCores)
-          doParallel::registerDoParallel(cl, cores = numCores) 
           attr(parallel, "cluster") <- cl
+          # export parent environment
+          varlist <- ls(envir = parent.frame(), all.names = TRUE)
+          varlist <- varlist[varlist != "..."]
+          parallel::clusterExport(cl, varlist = varlist,
+                                  # envir = parent.env(environment())
+                                  envir = parent.frame() )
+          # export global environment (workspace)
+          parallel::clusterExport(cl, 
+                                  varlist = ls(envir = globalenv(), 
+                                               all.names = TRUE),
+                                  envir = globalenv())
+          # load current packages in workers
+          pkgs <- .packages()
+          lapply(pkgs, function(pkg) 
+                 parallel::clusterCall(cl, library, package = pkg, 
+                                       character.only = TRUE))
+          #        
+          doParallel::registerDoParallel(cl, cores = numCores) 
         }
       else 
         { stop("Only 'snow' and 'multicore' clusters allowed!") }
