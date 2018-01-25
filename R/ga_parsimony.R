@@ -73,8 +73,8 @@ ga_parsimony <- function (fitness, ...,
             }
   on.exit(if(parallel & stopCluster) stopParallel(attr(parallel, "cluster")))
   # define operator to use depending on parallel being TRUE or FALSE
-  `%DO%` <- if(parallel && requireNamespace("doRNG", quietly = TRUE)) doRNG::`%dorng%`
-            else if(parallel) `%dopar%` else `%do%`
+  # `%DO%` <- if(parallel && requireNamespace("doRNG", quietly = TRUE)) doRNG::`%dorng%`
+  #          else if(parallel) `%dopar%` else `%do%`
               
               
  # parallel <- if (is.logical(parallel)) {if (parallel) startParallel(parallel) else FALSE} else {startParallel(parallel)}
@@ -176,7 +176,7 @@ ga_parsimony <- function (fitness, ...,
           # varlist <- ls(envir = parent.frame(), all.names = TRUE)
           # varlist <- varlist[varlist != "..."]
           # pkgs <- .packages() #.packages = pkgs, .export=varlist,.verbose=TRUE
-          Results_parallel <- foreach(i. = seq_len(popSize), .combine = "c") %DO% 
+          Results_parallel <- foreach(i. = seq_len(popSize), .combine = "c") %dopar% 
             {if (is.na(FitnessVal_vect[i.]) && sum(Pop[i.,(1+object@nParams):nvars])>0) fitness(Pop[i., ]) else c(FitnessVal_vect[i.],FitnessTst_vect[i.], Complexity_vect[i.])}
           # Extract results
           Results_parallel <- matrix(unlist(Results_parallel),object@popSize,ncol=3,byrow = TRUE)
