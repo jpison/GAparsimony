@@ -21,23 +21,24 @@ startParallel <- function(parallel = TRUE, ...)
   # set default parallel functionality depending on system OS:
   # - snow functionality on Windows OS
   # - multicore functionality on Unix-like systems (Unix/Linux & Mac OSX)
-  parallelType <- if(.Platform$OS.type == "windows") 
-                    "snow" else "multicore"
-  #parallelType <- "snow"
+  parallelType <- if(.Platform$OS.type == "windows") "snow" else "multicore"
+  
   # get the current number of cores available
   numCores <- parallel::detectCores()
 
   # set parameters for parallelization
   if(is.logical(parallel))
-    { NULL }
-  else if(is.numeric(parallel))
-    { numCores <- as.integer(parallel)
-      parallel <- TRUE }
-  else if(is.character(parallel))
-    { parallelType <- parallel
-      parallel <- TRUE 
-    }
-  else parallel <- FALSE
+    {
+    NULL 
+    } else if(is.numeric(parallel))
+      {
+      numCores <- as.integer(parallel)
+      parallel <- TRUE
+      }  else if(is.character(parallel))
+          {
+          parallelType <- parallel
+          parallel <- TRUE 
+          } else parallel <- FALSE
   
   attr(parallel, "type") <- parallelType
   attr(parallel, "cores") <- numCores
