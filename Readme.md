@@ -224,6 +224,8 @@ print(summary(GAparsimony_model))
 ```
 
 ``` {.r}
+
+
 # +------------------------------------+
 ##   |             GA-PARSIMONY           |
 ##   +------------------------------------+
@@ -586,60 +588,84 @@ print(paste0("Best Parsimonious ANN with ",round(GAparsimony_model@bestsolution[
 ``` {.r}
 print(summary(GAparsimony_model))
 ```
+``` {.r}
++------------------------------------+
+|             GA-PARSIMONY           |
++------------------------------------+
 
-    ## +------------------------------------+
-    ## |             GA-PARSIMONY           |
-    ## +------------------------------------+
-    ## 
-    ## GA-PARSIMONY settings: 
-    ##  Number of Parameters      =  2 
-    ##  Number of Features        =  13 
-    ##  Population size           =  40 
-    ##  Maximum of generations    =  100 
-    ##  Number of early-stop gen. =  10 
-    ##  Elitism                   =  8 
-    ##  Crossover probability     =  0.8 
-    ##  Mutation probability      =  0.1 
-    ##  Max diff(error) to ReRank =  0.01 
-    ##  Perc. of 1s in first popu.=  0.9 
-    ##  Prob. to be 1 in mutation =  0.1 
-    ##  Search domain = 
-    ##           size  decay crim zn indus chas nox rm age dis rad tax ptratio
-    ## Min_param    1 0.0001    0  0     0    0   0  0   0   0   0   0       0
-    ## Max_param   25 0.9999    1  1     1    1   1  1   1   1   1   1       1
-    ##           black lstat
-    ## Min_param     0     0
-    ## Max_param     1     1
-    ## 
-    ## 
-    ## GA-PARSIMONY results: 
-    ##  Iterations                = 30 
-    ##  Best indiv's validat.cost = -3.084126 
-    ##  Best indiv's testing cost = -3.025289 
-    ##  Best indiv's complexity   = 11001231 
-    ##  Elapsed time in minutes   = 34.04644 
-    ## 
-    ## 
-    ## BEST SOLUTION = 
-    ##                     [,1]
-    ## fitnessVal -3.084126e+00
-    ## fitnessTst -3.025289e+00
-    ## complexity  1.100123e+07
-    ## size        1.752418e+01
-    ## decay       9.827273e-01
-    ## crim        1.000000e+00
-    ## zn          1.000000e+00
-    ## indus       1.000000e+00
-    ## chas        0.000000e+00
-    ## nox         1.000000e+00
-    ## rm          1.000000e+00
-    ## age         1.000000e+00
-    ## dis         1.000000e+00
-    ## rad         1.000000e+00
-    ## tax         1.000000e+00
-    ## ptratio     1.000000e+00
-    ## black       0.000000e+00
-    ## lstat       1.000000e+00
+GA-PARSIMONY settings: 
+ Number of Parameters      =  2 
+ Number of Features        =  13 
+ Population size           =  40 
+ Maximum of generations    =  100 
+ Number of early-stop gen. =  10 
+ Elitism                   =  8 
+ Crossover probability     =  0.8 
+ Mutation probability      =  0.1 
+ Max diff(error) to ReRank =  0.01 
+ Perc. of 1s in first popu.=  0.9 
+ Prob. to be 1 in mutation =  0.1 
+ Search domain = 
+          size  decay crim zn indus chas nox rm age dis rad tax ptratio black lstat
+Min_param    1 0.0001    0  0     0    0   0  0   0   0   0   0       0     0     0
+Max_param   25 0.9999    1  1     1    1   1  1   1   1   1   1       1     1     1
+
+
+GA-PARSIMONY results: 
+ Iterations                = 30 
+ Best validation score = -3.076862 
+
+
+Solution with the best validation score in the whole GA process = 
+                    [,1]
+fitnessVal -3.076862e+00
+fitnessTst -2.937227e+00
+complexity  1.100125e+07
+size        1.789428e+01
+decay       9.819532e-01
+crim        1.000000e+00
+zn          1.000000e+00
+indus       1.000000e+00
+chas        0.000000e+00
+nox         1.000000e+00
+rm          1.000000e+00
+age         1.000000e+00
+dis         1.000000e+00
+rad         1.000000e+00
+tax         1.000000e+00
+ptratio     1.000000e+00
+black       0.000000e+00
+lstat       1.000000e+00
+
+
+Results of the best individual at the last generation = 
+ Best indiv's validat.cost = -3.084126 
+ Best indiv's testing cost = -3.025289 
+ Best indiv's complexity   = 11001231 
+ Elapsed time in minutes   = 33.92762 
+
+
+BEST SOLUTION = 
+                    [,1]
+fitnessVal -3.084126e+00
+fitnessTst -3.025289e+00
+complexity  1.100123e+07
+size        1.789428e+01
+decay       9.827273e-01
+crim        1.000000e+00
+zn          1.000000e+00
+indus       1.000000e+00
+chas        0.000000e+00
+nox         1.000000e+00
+rm          1.000000e+00
+age         1.000000e+00
+dis         1.000000e+00
+rad         1.000000e+00
+tax         1.000000e+00
+ptratio     1.000000e+00
+black       0.000000e+00
+lstat       1.000000e+00
+```
 
 Plot GA evolution.
 
