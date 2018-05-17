@@ -65,6 +65,7 @@ Note: the chromosome is a concatenated real vector with the model parameters (pa
 \item{crossover}{an R function performing crossover, i.e. a function which forms offsprings by combining part of the genetic information from their parents. See \code{\link{parsimony_crossover}} for available functions.}
 \item{mutation}{an R function performing mutation, i.e. a function which randomly alters the values of some genes in a parent chromosome. See \code{\link{parsimony_mutation}} for available functions.}
 \item{keep_history}{If it is TRUE keeps in the list \code{object@history} each generation. This parameter must set TRUE in order to use 'plot' method or 'parsimony_importance' function.}
+\item{path_name_to_save_iter}{If it is not NULL save the 'ga_parsimony' object to the 'path_name_to_save_iter' file at the end of each iteration. Note: use extension '.RData', example 'object.RData'}
 \item{early_stop}{the number of consecutive generations without any improvement in the best fitness value before the GA is stopped.}
 \item{maxFitness}{the upper bound on the fitness function after that the GA search is interrupted. Default value is set to +Inf}
 \item{suggestions}{a matrix of solutions strings to be included in the initial population. If provided the number of columns must match (object@nParams+object@nFeatures). Can be used a previous population, for example: 'ga_parsimony@history[[2]]$population'. }
