@@ -35,6 +35,8 @@ Objects can be created by calls to the \code{\link{ga_parsimony}} function.
     \item{\code{elitism}}{the number of best fitness individuals to survive at each generation;}
     \item{\code{pcrossover}}{the crossover probability;}
     \item{\code{pmutation}}{the mutation probability;}
+	\item{\code{best_score}}{the best validation score in the whole GA process;}
+	\item{\code{solution_best_score}}{Solution with the best validation score in the whole GA process;}
     \item{\code{fitnessval}}{the values of validation cost for the current (or final) population;}
 	\item{\code{fitnesstst}}{the values of testing cost for the current (or final) population;}
 	\item{\code{complexity}}{the values of model complexities for the current (or final) population;}
