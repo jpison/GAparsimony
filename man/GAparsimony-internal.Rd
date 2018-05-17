@@ -3,6 +3,7 @@
 \alias{clearConsoleLine}
 \alias{is.RStudio}
 \alias{startParallel}
+\alias{stopParallel}
 \alias{parsimony_summary}
 \alias{parsimony_control}
 
