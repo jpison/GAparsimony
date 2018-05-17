@@ -25,7 +25,8 @@ parsimony_rerank <- function(object, verbose=FALSE, ...)
   pos1 <- 1
   pos2 <- 2
   cambio <- FALSE
-  error_posic <- cost1[pos1]
+  #error_posic <- cost1[pos1]
+  error_posic <- object@best_score
   
   while(pos1!=object@popSize)
   {
