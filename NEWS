@@ -1,0 +1,11 @@
+Version 0.9-2 (2018-05)
+
+- Keeps and shows the individual with the best validation score in the whole GA process. It can be different than the best parsimonious solution at the last generation.
+- Solved problems with 'suggestions'. This parameter can be set with an initial population matrix in order to continue the GA process.
+- The 'object' and 'iter_ini' parameters permit to continue the GA process by using a previous 'ga_parsimony' object by selecting an initial population from 'object@history' and with GA settings of the previous GA process. 
+- Included a new parameter 'path_name_to_save_iter'. If it is not NULL, the 'ga_parsimony' object is saved in each iteration in a file with that name.
+
+
+Version 0.9-1 (2017-08)
+
+- First release on CRAN.
