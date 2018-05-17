@@ -24,7 +24,8 @@ ga_parsimony <- function (fitness, ...,
                           selection = parsimony_nlrSelection, 
                           crossover = parsimony_crossover, 
                           mutation = parsimony_mutation, 
-                          keep_history = FALSE, 
+                          keep_history = FALSE,
+                          path_name_to_save_iter = NULL,
                           early_stop = maxiter, maxFitness = Inf, suggestions = NULL, 
                           parallel = FALSE,
                           monitor = if (interactive()) parsimony_monitor else FALSE, 
@@ -305,6 +306,7 @@ ga_parsimony <- function (fitness, ...,
     
     # Call to 'monitor' function
     # --------------------------
+    if (!is.null(path_name_to_save_iter)) save(object,file=path_name_to_save_iter)
     if (is.function(monitor) && !verbose) monitor(object)  
     
     if (verbose)
