@@ -36,6 +36,7 @@ parsimony_rerank(object, verbose=FALSE, ...)
 library(GAparsimony)
 object <- new("ga_parsimony", 
               rerank_error=0.2,
+              best_score = 2.0,
               popSize = 4, 
               fitnessval = c(2.0, 1.9, 1.1, 1.0), 
               complexity=c(2,1,2,1))
