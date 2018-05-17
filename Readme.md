@@ -1,7 +1,7 @@
 GAparsimony
 ===========
 
-GAparsimony R package is a GA-based optimization method for searching
+GAparsimony for R is a GA-based package for searching
 accurate parsimonious models by combining feature selection (FS), model
 hyperparameter optimization (HO), and parsimonious model selection
 (PMS).
@@ -62,10 +62,10 @@ How to use this package
 ### Example 1: Classification
 
 This example shows how to search, for the *Sonar* database, a parsimony
-classification SVM model with **GAparsimony** and **caret** packages.
+SVM classificator with **GAparsimony** and **caret** packages.
 
 First, we create a 80% of database for searching the model and the
-remaining 20% for the test database. The test database will be only used
+remaining 20% for testing. The test database will be only used
 for checking the models’ generalization capability.
 
 ``` {.r}
@@ -81,11 +81,11 @@ data_train <- Sonar[ inTraining,]
 data_test  <- Sonar[-inTraining,]
 ```
 With small databases, it is highly recommended to execute
-**GAparsimony** with a different set of test databases in order to find
+**GAparsimony** with different seeds in order to find
 the most important input features and model parameters. In this example,
-one iteration is showed with a training database composed of 60 input
+one iteration is presented with a training database composed of 60 input
 features and 167 instances, and a test database with only 41 instances.
-Therefore, a robust validation metric will be necessary.
+Hence, a robust validation metric is necessary.
 
 ``` {.r}
 print(dim(data_train))
@@ -101,20 +101,18 @@ two elements of *chromosome* vector. Next 60 elements of chromosome
 correspond with the selected input features, *selec\_feat*. They are
 binarized to one when they are one greater than \> 0.50.
 
-A SVM model is trained with these parameters and selected input
+A SVM model is trained with these parameters and the selected input
 features. Finally, *fitness\_SVM()* returns a vector with three values:
-the kappa statistic obtained with a 10 repeats of a 10-fold
+the kappa statistic obtained with the mean of 10 runs of a 10-fold
 cross-validation process, the kappa measured with the test database to
 check the model generalization capability, and the model complexity.
 
 In this example, the model complexity combines the number of features
-multiplied by 1E6 plus the number of support vectors in the selected
-model. Therefore, PMS considers the most parsimonious model with the
+multiplied by 1E6 plus the number of support vectors for each model. 
+Therefore, PMS considers the most parsimonious model with the
 lower number of features. Between two models with the same number of
 features, the lower number of support vectors will determine the most
-parsimonious model.
-
-However, other parsimonious metrics could be considered in future
+parsimonious model. However, other parsimonious metrics could be considered in future
 applications.
 
 ``` {.r}
@@ -145,14 +143,14 @@ fitness_SVM <- function(chromosome, ...)
   model <- train(Class ~ ., data=data_train_model, trControl=train_control, 
                  method="svmRadial", tuneGrid=tuneGrid, verbose=F)
 
-  # Extract kappa statistics (repeated k-fold CV and testing kappa)
+  # Extract kappa statistics (the repeated k-fold CV and the kappa with the test DB)
   kappa_val <- model$results$Kappa
   kappa_test <- postResample(pred=predict(model, data_test_model),
                                 obs=data_test_model[,ncol(data_test_model)])[2]
   # Obtain Complexity = Num_Features*1E6+Number of support vectors
   complexity <- sum(selec_feat)*1E6+model$finalModel@nSV 
   
-  # Return(-validation error, -testing error, model_complexity)
+  # Return(validation score, testing score, model_complexity)
   vect_errors <- c(kappa_val=kappa_val,kappa_test=kappa_test,complexity=complexity)
   return(vect_errors)
 }
@@ -163,7 +161,9 @@ and their names. Also, *rerank\_error* can be tuned with different
 *ga\_parsimony* runs to improve the **model generalization capability**.
 In this example, *rerank\_error* has been fixed to 0.001 but other
 values could improve the trade-off between model complexity and model
-accuracy.
+accuracy. For example, with *rerank\_error=0.01*, we can be interested 
+in obtaining models with a smaller number of inputs with a kappa rounded
+to two decimals.
 
 ``` {.r}
 # ---------------------------------------------------------------------------------
@@ -223,112 +223,184 @@ print(paste0("Best Parsimonious SVM with C=",GAparsimony_model@bestsolution['C']
 print(summary(GAparsimony_model))
 ```
 
-    ## +------------------------------------+
-    ## |             GA-PARSIMONY           |
-    ## +------------------------------------+
-    ## 
-    ## GA-PARSIMONY settings: 
-    ##  Number of Parameters      =  2 
-    ##  Number of Features        =  60 
-    ##  Population size           =  40 
-    ##  Maximum of generations    =  100 
-    ##  Number of early-stop gen. =  10 
-    ##  Elitism                   =  8 
-    ##  Crossover probability     =  0.8 
-    ##  Mutation probability      =  0.1 
-    ##  Max diff(error) to ReRank =  0.001 
-    ##  Perc. of 1s in first popu.=  0.9 
-    ##  Prob. to be 1 in mutation =  0.1 
-    ##  Search domain = 
-    ##                 C   sigma V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14
-    ## Min_param  0.0001 0.00001  0  0  0  0  0  0  0  0  0   0   0   0   0   0
-    ## Max_param 99.9999 0.99999  1  1  1  1  1  1  1  1  1   1   1   1   1   1
-    ##           V15 V16 V17 V18 V19 V20 V21 V22 V23 V24 V25 V26 V27 V28 V29 V30
-    ## Min_param   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
-    ## Max_param   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
-    ##           V31 V32 V33 V34 V35 V36 V37 V38 V39 V40 V41 V42 V43 V44 V45 V46
-    ## Min_param   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
-    ## Max_param   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
-    ##           V47 V48 V49 V50 V51 V52 V53 V54 V55 V56 V57 V58 V59 V60
-    ## Min_param   0   0   0   0   0   0   0   0   0   0   0   0   0   0
-    ## Max_param   1   1   1   1   1   1   1   1   1   1   1   1   1   1
-    ## 
-    ## 
-    ## GA-PARSIMONY results: 
-    ##  Iterations                = 31 
-    ##  Best indiv's validat.cost = 0.8554789 
-    ##  Best indiv's testing cost = 0.8523409 
-    ##  Best indiv's complexity   = 24000113 
-    ##  Elapsed time in minutes   = 7.543422 
-    ## 
-    ## 
-    ## BEST SOLUTION = 
-    ##                    [,1]
-    ## fitnessVal 8.554789e-01
-    ## fitnessTst 8.523409e-01
-    ## complexity 2.400011e+07
-    ## C          4.411618e+01
-    ## sigma      4.385246e-02
-    ## V1         1.000000e+00
-    ## V2         0.000000e+00
-    ## V3         0.000000e+00
-    ## V4         0.000000e+00
-    ## V5         1.000000e+00
-    ## V6         0.000000e+00
-    ## V7         0.000000e+00
-    ## V8         1.000000e+00
-    ## V9         1.000000e+00
-    ## V10        1.000000e+00
-    ## V11        1.000000e+00
-    ## V12        1.000000e+00
-    ## V13        0.000000e+00
-    ## V14        0.000000e+00
-    ## V15        0.000000e+00
-    ## V16        1.000000e+00
-    ## V17        1.000000e+00
-    ## V18        0.000000e+00
-    ## V19        0.000000e+00
-    ## V20        0.000000e+00
-    ## V21        0.000000e+00
-    ## V22        0.000000e+00
-    ## V23        1.000000e+00
-    ## V24        0.000000e+00
-    ## V25        0.000000e+00
-    ## V26        1.000000e+00
-    ## V27        0.000000e+00
-    ## V28        1.000000e+00
-    ## V29        0.000000e+00
-    ## V30        0.000000e+00
-    ## V31        0.000000e+00
-    ## V32        1.000000e+00
-    ## V33        1.000000e+00
-    ## V34        0.000000e+00
-    ## V35        0.000000e+00
-    ## V36        1.000000e+00
-    ## V37        0.000000e+00
-    ## V38        0.000000e+00
-    ## V39        0.000000e+00
-    ## V40        1.000000e+00
-    ## V41        0.000000e+00
-    ## V42        1.000000e+00
-    ## V43        0.000000e+00
-    ## V44        0.000000e+00
-    ## V45        1.000000e+00
-    ## V46        0.000000e+00
-    ## V47        0.000000e+00
-    ## V48        0.000000e+00
-    ## V49        0.000000e+00
-    ## V50        0.000000e+00
-    ## V51        0.000000e+00
-    ## V52        1.000000e+00
-    ## V53        1.000000e+00
-    ## V54        1.000000e+00
-    ## V55        1.000000e+00
-    ## V56        1.000000e+00
-    ## V57        0.000000e+00
-    ## V58        0.000000e+00
-    ## V59        0.000000e+00
-    ## V60        1.000000e+00
+``` {.r}
+# +------------------------------------+
+##   |             GA-PARSIMONY           |
+##   +------------------------------------+
+## 
+##   GA-PARSIMONY settings:
+#   Number of Parameters      =  2
+#   Number of Features        =  60
+#   Population size           =  40
+#   Maximum of generations    =  100
+#   Number of early-stop gen. =  10
+#   Elitism                   =  8
+#   Crossover probability     =  0.8
+#   Mutation probability      =  0.1
+#   Max diff(error) to ReRank =  0.001
+#   Perc. of 1s in first popu.=  0.9
+#   Prob. to be 1 in mutation =  0.1
+#   Search domain =
+#     C   sigma V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15 V16 V17 V18 V19 V20 V21 V22 V23 V24 V25 V26 V27 V28
+#   Min_param  0.0001 0.00001  0  0  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+#   Max_param 99.9999 0.99999  1  1  1  1  1  1  1  1  1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+#   V29 V30 V31 V32 V33 V34 V35 V36 V37 V38 V39 V40 V41 V42 V43 V44 V45 V46 V47 V48 V49 V50 V51 V52 V53 V54 V55 V56 V57 V58
+#   Min_param   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+#   Max_param   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+#   V59 V60
+#   Min_param   0   0
+#   Max_param   1   1
+# 
+# 
+#   GA-PARSIMONY results:
+#     Iterations                = 31
+#   Best validation score = 0.8564253
+# 
+# 
+#   Solution with the best validation score in the whole GA process =
+#     [,1]
+#   fitnessVal 8.564253e-01
+#   fitnessTst 8.523409e-01
+#   complexity 2.500011e+07
+#   C          4.411618e+01
+#   sigma      4.385246e-02
+#   V1         1.000000e+00
+#   V2         0.000000e+00
+#   V3         0.000000e+00
+#   V4         0.000000e+00
+#   V5         1.000000e+00
+#   V6         0.000000e+00
+#   V7         0.000000e+00
+#   V8         1.000000e+00
+#   V9         1.000000e+00
+#   V10        1.000000e+00
+#   V11        1.000000e+00
+#   V12        1.000000e+00
+#   V13        0.000000e+00
+#   V14        0.000000e+00
+#   V15        0.000000e+00
+#   V16        1.000000e+00
+#   V17        1.000000e+00
+#   V18        0.000000e+00
+#   V19        0.000000e+00
+#   V20        0.000000e+00
+#   V21        0.000000e+00
+#   V22        0.000000e+00
+#   V23        1.000000e+00
+#   V24        0.000000e+00
+#   V25        0.000000e+00
+#   V26        1.000000e+00
+#   V27        0.000000e+00
+#   V28        1.000000e+00
+#   V29        1.000000e+00
+#   V30        0.000000e+00
+#   V31        0.000000e+00
+#   V32        1.000000e+00
+#   V33        1.000000e+00
+#   V34        0.000000e+00
+#   V35        0.000000e+00
+#   V36        1.000000e+00
+#   V37        0.000000e+00
+#   V38        0.000000e+00
+#   V39        0.000000e+00
+#   V40        1.000000e+00
+#   V41        0.000000e+00
+#   V42        1.000000e+00
+#   V43        0.000000e+00
+#   V44        0.000000e+00
+#   V45        1.000000e+00
+#   V46        0.000000e+00
+#   V47        0.000000e+00
+#   V48        0.000000e+00
+#   V49        0.000000e+00
+#   V50        0.000000e+00
+#   V51        0.000000e+00
+#   V52        1.000000e+00
+#   V53        1.000000e+00
+#   V54        1.000000e+00
+#   V55        1.000000e+00
+#   V56        1.000000e+00
+#   V57        0.000000e+00
+#   V58        0.000000e+00
+#   V59        0.000000e+00
+#   V60        1.000000e+00
+# 
+# 
+#   Results of the best individual at the last generation =
+#     Best indiv's validat.cost = 0.8554789
+#   Best indiv's testing cost = 0.8523409
+#   Best indiv's complexity   = 24000113
+#   Elapsed time in minutes   = 7.650901
+# 
+# 
+#   BEST SOLUTION =
+#   [,1]
+#   fitnessVal 8.554789e-01
+#   fitnessTst 8.523409e-01
+#   complexity 2.400011e+07
+#   C          4.411618e+01
+#   sigma      4.385246e-02
+#   V1         1.000000e+00
+#   V2         0.000000e+00
+#   V3         0.000000e+00
+#   V4         0.000000e+00
+#   V5         1.000000e+00
+#   V6         0.000000e+00
+#   V7         0.000000e+00
+#   V8         1.000000e+00
+#   V9         1.000000e+00
+#   V10        1.000000e+00
+#   V11        1.000000e+00
+#   V12        1.000000e+00
+#   V13        0.000000e+00
+#   V14        0.000000e+00
+#   V15        0.000000e+00
+#   V16        1.000000e+00
+#   V17        1.000000e+00
+#   V18        0.000000e+00
+#   V19        0.000000e+00
+#   V20        0.000000e+00
+#   V21        0.000000e+00
+#   V22        0.000000e+00
+#   V23        1.000000e+00
+#   V24        0.000000e+00
+#   V25        0.000000e+00
+#   V26        1.000000e+00
+#   V27        0.000000e+00
+#   V28        1.000000e+00
+#   V29        0.000000e+00
+#   V30        0.000000e+00
+#   V31        0.000000e+00
+#   V32        1.000000e+00
+#   V33        1.000000e+00
+#   V34        0.000000e+00
+#   V35        0.000000e+00
+#   V36        1.000000e+00
+#   V37        0.000000e+00
+#   V38        0.000000e+00
+#   V39        0.000000e+00
+#   V40        1.000000e+00
+#   V41        0.000000e+00
+#   V42        1.000000e+00
+#   V43        0.000000e+00
+#   V44        0.000000e+00
+#   V45        1.000000e+00
+#   V46        0.000000e+00
+#   V47        0.000000e+00
+#   V48        0.000000e+00
+#   V49        0.000000e+00
+#   V50        0.000000e+00
+#   V51        0.000000e+00
+#   V52        1.000000e+00
+#   V53        1.000000e+00
+#   V54        1.000000e+00
+#   V55        1.000000e+00
+#   V56        1.000000e+00
+#   V57        0.000000e+00
+#   V58        0.000000e+00
+#   V59        0.000000e+00
+#   V60        1.000000e+00
+```
 
 Plot GA evolution.
 
@@ -345,7 +417,7 @@ GA-PARSIMONY evolution
 Show percentage of appearance of each feature in elitists
 
 ``` {.r}
-# Percentage of appearance of each feature in elitists
+# Percentage of appearance of each feature in the elitists
 print(parsimony_importance(GAparsimony_model))
 ```
 
@@ -370,7 +442,7 @@ print(parsimony_importance(GAparsimony_model))
 
 ### Example 2: Regression
 
-This example shows how to search, for the *Boston* database, a parsimony
+This example shows how to search, for the *Boston* database, a parsimonious
 regressor ANN model with **GAparsimony** and **caret** packages.
 
 First, we create a 80% of database for searching the model and the
@@ -404,7 +476,7 @@ Similar to the previous example a fitness function is created,
 This function extracts **size** and **decay** NNET parameters from the
 first two elements of *chromosome* vector. Next 13 elements of
 chromosome correspond with the selected input features, *selec\_feat*.
-They are binarized to one when they are one greater than \> 0.50.
+They are binarized to one when are greater than \> 0.50.
 
 A NNET model is trained with these parameters and selected input
 features. Finally, *fitness\_NNET()* returns a vector with three values:
@@ -415,7 +487,9 @@ complexity. Negative values of RMSE are returned because *ga\_parsimony*
 **maximizes** the validation cost,
 
 In this example, the model complexity combines the number of features
-multiplied by 1E6 plus the sum of the squared network weights.
+multiplied by 1E6 plus the sum of the squared network weights which measures 
+the internal ANN complexity.
+
 Therefore, PMS considers the most parsimonious model with the lower
 number of features. Between two models with the same number of features,
 the lower sum of the squared network weights will determine the most
@@ -429,10 +503,10 @@ applications.
 # ----------------------------------------
 fitness_NNET <- function(chromosome, ...)
 {
-  # First two values in chromosome are 'size' & 'decay' of 'nnet' method
+  # First two values in chromosome are 'size' & 'decay' of the 'nnet' method
   tuneGrid <- data.frame(size=round(chromosome[1]),decay=chromosome[2])
   
-  # Next values of chromosome are the selected features (TRUE if > 0.50)
+  # Next values of chromosome are the selected features that are > 0.50
   selec_feat <- chromosome[3:length(chromosome)]>0.50
   if (sum(selec_feat)<1) return(c(rmse_val=-Inf,rmse_test=-Inf,complexity=Inf))
   
@@ -445,7 +519,7 @@ fitness_NNET <- function(chromosome, ...)
   # 'number' of folds could be adjusted to improve the measure.
   train_control <- trainControl(method = "repeatedcv",number = 10,repeats = 5)
   
-  # train the model
+  # Train the model
   set.seed(1234)
   model <- train(medv ~ ., data=data_train_model, trControl=train_control, 
                  method="nnet", tuneGrid=tuneGrid, trace=F, linout = 1)
@@ -581,10 +655,10 @@ elitists <- plot(GAparsimony_model, window=FALSE, general_cex=0.6, pos_cost_num=
 
 GA-PARSIMONY evolution
 
-Show percentage of appearance of each feature in elitists
+Show the percentage of appearance for each feature only of elitists.
 
 ``` {.r}
-# Percentage of appearance of each feature in elitists
+# Percentage of appearance of each feature in the elitists
 print(parsimony_importance(GAparsimony_model))
 ```
 
