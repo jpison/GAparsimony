@@ -1,7 +1,7 @@
 GAparsimony
 ===========
 
-GAparsimony for R is a GA-based package for searching
+GAparsimony for R is a package for searching with genetic algorithms (GA) 
 accurate parsimonious models by combining feature selection (FS), model
 hyperparameter optimization (HO), and parsimonious model selection
 (PMS).
@@ -82,10 +82,11 @@ data_test  <- Sonar[-inTraining,]
 ```
 With small databases, it is highly recommended to execute
 **GAparsimony** with different seeds in order to find
-the most important input features and model parameters. In this example,
-one iteration is presented with a training database composed of 60 input
-features and 167 instances, and a test database with only 41 instances.
-Hence, a robust validation metric is necessary.
+the most important input features and model parameters.
+
+In this example, one GA optimization is presented with a training database 
+composed of 60 input features and 167 instances, and a test database with only 41 instances.
+Hence, a robust validation metric is necessary. Thus, a repeated cross-validation is performed.
 
 ``` {.r}
 print(dim(data_train))
@@ -94,7 +95,7 @@ print(dim(data_test))
     ## [1] 167  61
     ## [1] 41 61
 
-In the next step, a fitness function is created, *fitness\_SVM()*.
+In the next step, a fitness function is created: *fitness\_SVM()*.
 
 This function extracts **C** and **sigma** SVM parameters from the first
 two elements of *chromosome* vector. Next 60 elements of chromosome
@@ -103,17 +104,17 @@ binarized to one when they are one greater than \> 0.50.
 
 A SVM model is trained with these parameters and the selected input
 features. Finally, *fitness\_SVM()* returns a vector with three values:
-the kappa statistic obtained with the mean of 10 runs of a 10-fold
-cross-validation process, the kappa measured with the test database to
+the *kappa* statistic obtained with the mean of 10 runs of a 10-fold
+cross-validation process, the *kappa* measured with the test database to
 check the model generalization capability, and the model complexity.
 
-In this example, the model complexity combines the number of features
-multiplied by 1E6 plus the number of support vectors for each model. 
+In this example, the model complexity combines the number of selected features
+multiplied by 1E6 plus the number of support vectors of each model. 
 Therefore, PMS considers the most parsimonious model with the
 lower number of features. Between two models with the same number of
 features, the lower number of support vectors will determine the most
 parsimonious model. However, other parsimonious metrics could be considered in future
-applications.
+applications (AIC, BIC, GDF, ...)..
 
 ``` {.r}
 # Function to evaluate each SVM individual
@@ -162,7 +163,7 @@ and their names. Also, *rerank\_error* can be tuned with different
 In this example, *rerank\_error* has been fixed to 0.001 but other
 values could improve the trade-off between model complexity and model
 accuracy. For example, with *rerank\_error=0.01*, we can be interested 
-in obtaining models with a smaller number of inputs with a kappa rounded
+in obtaining models with a smaller number of inputs with a *kappa* rounded
 to two decimals.
 
 ``` {.r}
@@ -206,7 +207,7 @@ GAparsimony_model <- ga_parsimony(fitness=fitness_SVM,
 ```
 
 Show the results of the best parsimonious model. We can see similar
-validation and testing kappas.
+validation and testing *kappas*.
 
 ``` {.r}
 print(paste0("Best Parsimonious SVM with C=",GAparsimony_model@bestsolution['C'],
@@ -216,15 +217,13 @@ print(paste0("Best Parsimonious SVM with C=",GAparsimony_model@bestsolution['C']
              " Num Features=",round(GAparsimony_model@bestsolution['complexity']/1E6,0),
              " Complexity=",round(GAparsimony_model@bestsolution['complexity'],2)))
 ```
-
+``` {.r}
     ## [1] "Best Parsimonious SVM with C=44.1161803299857 sigma=0.043852464390368 ->  KappaVal=0.855479 KappaTst=0.852341 Num Features=24 Complexity=24000113"
+```
+Summary() function shows the GA initial settings and two solutions: the solution with the best validation score in the whole GA optimization process, and finally, the best parsimonious individual at the last generation. 
 
 ``` {.r}
 print(summary(GAparsimony_model))
-```
-
-``` {.r}
-
 
 # +------------------------------------+
 ##   |             GA-PARSIMONY           |
@@ -416,10 +415,10 @@ elitists <- plot(GAparsimony_model, window=FALSE, general_cex=0.6, pos_cost_num=
 
 GA-PARSIMONY evolution
 
-Show percentage of appearance of each feature in elitists
+Show percentage of appearance for each feature in elitists
 
 ``` {.r}
-# Percentage of appearance of each feature in the elitists
+# Percentage of appearance for each feature in elitists
 print(parsimony_importance(GAparsimony_model))
 ```
 
@@ -445,7 +444,7 @@ print(parsimony_importance(GAparsimony_model))
 ### Example 2: Regression
 
 This example shows how to search, for the *Boston* database, a parsimonious
-regressor ANN model with **GAparsimony** and **caret** packages.
+ANN model for regression and with **GAparsimony** and **caret** packages.
 
 First, we create a 80% of database for searching the model and the
 remaining 20% for the test database. The test database will be only used
@@ -472,7 +471,7 @@ print(dim(data_test))
     ## [1] 407  14
     ## [1] 99 14
 
-Similar to the previous example a fitness function is created,
+Similar to the previous example, a fitness function is created:
 *fitness\_NNET()*.
 
 This function extracts **size** and **decay** NNET parameters from the
@@ -486,19 +485,19 @@ the negative RMSE obtained with a 5 repeats of a 10-fold
 cross-validation process, the negative RMSE measured with the test
 database to check the model generalization capability, and the model
 complexity. Negative values of RMSE are returned because *ga\_parsimony*
-**maximizes** the validation cost,
+tries to **maximize** the validation cost,
 
 In this example, the model complexity combines the number of features
 multiplied by 1E6 plus the sum of the squared network weights which measures 
-the internal ANN complexity.
+the internal complexity of the ANN.
 
 Therefore, PMS considers the most parsimonious model with the lower
 number of features. Between two models with the same number of features,
 the lower sum of the squared network weights will determine the most
-parsimonious model.
+parsimonious model (smaller weights reduce the propagation of disturbances).
 
 However, other parsimonious metrics could be considered in future
-applications.
+applications (AIC, BIC, GDF, ...).
 
 ``` {.r}
 # Function to evaluate each ANN individual
@@ -533,13 +532,13 @@ fitness_NNET <- function(chromosome, ...)
   complexity <- sum(selec_feat)*1E6+sum(model$finalModel$wts*model$finalModel$wts)  
   
   # Return(-validation error, -testing error, model_complexity)
-  # errors are negative because GA-PARSIMONY tries to maximize values
+  # Errors are negative because GA-PARSIMONY tries to maximize values
   vect_errors <- c(rmse_val=-rmse_val,rmse_test=-rmse_test,complexity=complexity)
   return(vect_errors)
 }
 ```
 
-Initial settings.
+Initial GA settings.
 
 ``` {.r}
 # ---------------------------------------------------------------------------------
@@ -588,6 +587,8 @@ print(paste0("Best Parsimonious ANN with ",round(GAparsimony_model@bestsolution[
 ``` {.r}
 print(summary(GAparsimony_model))
 ```
+Summary() function shows the GA initial settings and two solutions: the solution with the best validation score in the whole GA optimization process, and finally, the best parsimonious individual at the last generation.
+
 ``` {.r}
 +------------------------------------+
 |             GA-PARSIMONY           |
@@ -681,7 +682,7 @@ elitists <- plot(GAparsimony_model, window=FALSE, general_cex=0.6, pos_cost_num=
 
 GA-PARSIMONY evolution
 
-Show the percentage of appearance for each feature only of elitists.
+Show the percentage of appearance of each feature in the elitists.
 
 ``` {.r}
 # Percentage of appearance of each feature in the elitists
