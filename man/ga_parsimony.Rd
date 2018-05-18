@@ -127,7 +127,7 @@ Antonanzas-Torres F., Urraca R., Antonanzas J., Fernandez-Ceniceros J., Martinez
 # and 'caret' packages. Validation errors and iterations have been
 # reduced to speedup the process
 
-
+library(GAparsimony)
 # Training and testing Datasets
 library(caret)
 
@@ -208,13 +208,13 @@ GAparsimony_model <- ga_parsimony(fitness=fitness_SVM,
                                   names_features=colnames(data_train)[-ncol(data_train)],
                                   keep_history = TRUE, 
                                   rerank_error = rerank_error,
-                                  popSize = 10, #Change to 40
-                                  maxiter = 1, # Change to 100
+                                  popSize = 5, #Change to 40!!!
+                                  maxiter = 1, # Change to 100!!!
                                   early_stop=10,
                                   feat_thres=0.90,# Perc selec features in first iter
                                   feat_mut_thres=0.10,# Prob. feature to be 1 in mutation
                                   not_muted=1,
-                                  parallel = FALSE, # speedup with n cores or TRUE=all
+                                  parallel = FALSE, # speedup with 'n' cores or all with TRUE
                                   seed_ini = 1234)
 
 
@@ -291,7 +291,7 @@ print(parsimony_importance(GAparsimony_model))
     # Obtain Complexity = Num_Features*1E6+Number of support vectors
     complexity <- sum(selec_feat)*1E6+model$finalModel@nSV 
     
-    # Return(-validation error, -testing error, model_complexity)
+    # Return(validation error, testing error, model_complexity)
     vect_errors <- c(kappa_val=kappa_val,kappa_test=kappa_test,complexity=complexity)
     return(vect_errors)
   }
