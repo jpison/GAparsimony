@@ -229,9 +229,9 @@ ga_parsimony <- function (fitness, ...,
     FitnessVal_vect <- FitnessValSorted
     FitnessTst_vect <- FitnessTstSorted
     Complexity_vect <- ComplexitySorted
-    if (max(FitnessVal_vect)>object@best_score) 
+    if (max(FitnessVal_vect, na.rm=TRUE)>object@best_score) 
     {
-      object@best_score <- max(FitnessVal_vect)
+      object@best_score <- max(FitnessVal_vect, na.rm=TRUE)
       object@solution_best_score <- c(object@best_score, 
                                       FitnessTst_vect[which.max(FitnessVal_vect)], 
                                       Complexity_vect[which.max(FitnessVal_vect)], 
