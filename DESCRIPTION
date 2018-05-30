@@ -1,7 +1,7 @@
 Package: GAparsimony
 Type: Package
 Title: Searching Parsimony Models with Genetic Algorithms
-Version: 0.9.2
+Version: 0.9.3
 Date: 2018-05-17
 Authors@R: person("F.J.", "Martinez-de-Pison", email = "fjmartin@unirioja.es", role = c("aut", "cre"))
 Description: Methodology that combines feature selection, model tuning, and parsimonious model selection with Genetic Algorithms (GA) proposed in {Martinez-de-Pison} (2015) <DOI:10.1016/j.asoc.2015.06.012>. To this objective, a novel GA selection procedure is introduced based on separate cost and complexity evaluations.
