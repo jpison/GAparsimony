@@ -363,7 +363,7 @@ ga_parsimony <- function (fitness, ...,
     # ------------------
     if (is.function(crossover) & pcrossover > 0)
       {
-      nmating <- floor(popSize/2)
+      nmating <- floor(object@popSize/2)
       mating <- matrix(sample(1:(2 * nmating), size = (2 * nmating)), ncol = 2)
       for (i in seq_len(nmating))
         {
