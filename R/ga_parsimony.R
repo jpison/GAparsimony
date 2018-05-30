@@ -168,9 +168,8 @@ ga_parsimony <- function (fitness, ...,
                   pcrossover = object_old@pcrossover, minutes_total=0, best_score = object_old@best_score,
                   history = vector(mode = "list",length = object_old@maxiter),
                   pmutation = if (is.numeric(object_old@pmutation)) object_old@pmutation else NA, 
-                  fitnessval = object_old@fitnessval, 
-                  fitnesstst=object_old@fitnesstst, complexity=object_old@complexity,
-                  summary = object_old@summary, bestSolList = object_old@bestSolList) 
+                  fitnessval = FitnessVal_vect, fitnesstst=FitnessTst_vect, complexity=Complexity_vect,
+                  summary = fitnessSummary, bestSolList = bestSolList)
     Pop <- object@population
   }
   
