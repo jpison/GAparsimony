@@ -77,10 +77,10 @@ startParallel <- function(parallel = TRUE, ...)
           # export parent environment
           varlist <- ls(envir = parent.frame(), all.names = TRUE)
           varlist <- varlist[varlist != "..."]
-          parallel::clusterExport(cl, varlist = varlist,
-                                  # envir = parent.env(environment())
-                                  envir = parent.frame() )
-          # export global environment (workspace)
+         # parallel::clusterExport(cl, varlist = varlist,
+         #                         # envir = parent.env(environment())
+         #                         envir = parent.frame() )
+         # export global environment (workspace)
           parallel::clusterExport(cl, 
                                   varlist = ls(envir = globalenv(), 
                                                all.names = TRUE),
