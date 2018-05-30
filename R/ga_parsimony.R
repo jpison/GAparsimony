@@ -146,9 +146,12 @@ ga_parsimony <- function (fitness, ...,
     }
   } else
   {
+    print("There is a GAparsimony 'object'!!!")
+    print(summary(object))
     object_old <- object
     if (is.null(iter_ini)) iter_ini <- object_old@iter else iter_ini <- min(iter_ini,object_old@iter)
     if (iter_ini<=0) iter_ini <- 1
+    print(paste0("Starting GA optimization with the object's GA settings and the population of iter=",iter_ini,"."))
     
     object <- new("ga_parsimony", call = object_old@call, 
                   min_param = object_old@min_param, max_param = object_old@max_param,
