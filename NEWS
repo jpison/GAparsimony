@@ -1,3 +1,8 @@
+Version 0.9.3 (20018-06)
+
+- Print if 'object' or 'suggestions' are provided.
+- Fix a repeated code in parallel.R
+
 Version 0.9.2 (2018-05)
 
 - Keeps and shows the individual with the best validation score in the whole GA process. It can be different than the best parsimonious solution at the last generation.
