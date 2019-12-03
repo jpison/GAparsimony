@@ -162,7 +162,7 @@ fitness_SVM <- function(chromosome, ...)
 	# Yo obtain a robust validation measure
 	# use 'repeatedcv' with more folds and times
 	# (see 2nd and 3rd examples...)
-	train_control <- trainControl(method = "cv",number = 2)
+	train_control <- trainControl(method = "cv",number = 5)
 
 	# train the model
 	set.seed(1234)
@@ -198,8 +198,10 @@ max_param <- c(0.9999, 0.99999)
 names_param <- c("C","sigma")
   
 # ga_parsimony can be executed with a different set of 'rerank_error' values
-rerank_error <- 0.01
- 
+rerank_error <- 0.001
+
+\donttest{
+	
 GAparsimony_model <- ga_parsimony(fitness=fitness_SVM,
                                   min_param=min_param, 
                                   max_param=max_param,
@@ -208,9 +210,9 @@ GAparsimony_model <- ga_parsimony(fitness=fitness_SVM,
                                   names_features=colnames(data_train)[-ncol(data_train)],
                                   keep_history = TRUE, 
                                   rerank_error = rerank_error,
-                                  popSize = 5, #Change to 40!!!
-                                  maxiter = 1, # Change to 100!!!
-                                  early_stop=10,
+                                  popSize = 20,
+                                  maxiter = 20,
+                                  early_stop=7
                                   feat_thres=0.90,# Perc selec features in first iter
                                   feat_mut_thres=0.10,# Prob. feature to be 1 in mutation
                                   not_muted=1,
@@ -236,7 +238,7 @@ print(summary(GAparsimony_model))
   
 print(parsimony_importance(GAparsimony_model))
 
-\donttest{
+
   
   #################################
   ### Example 2: Classification ###
