@@ -5,10 +5,12 @@ parsimony_monitor <- function(object, digits = getOption("digits"), ...)
   fitnessval <- na.exclude(object@fitnessval)
   fitnesstst <- na.exclude(object@fitnesstst)
   complexity <- na.exclude(object@complexity)
+  time_min <- na.exclude(object@minutes_gen)
 
   sumryStat <- c(mean(fitnessval), max(fitnessval), 
                  mean(fitnesstst), fitnesstst[which.max(fitnessval)], 
-                 mean(complexity), complexity[which.max(fitnessval)]) 
+                 mean(complexity), complexity[which.max(fitnessval)],
+                 time_min) 
   sumryStat <- format(sumryStat, digits = digits)
   
   
@@ -24,7 +26,9 @@ parsimony_monitor <- function(object, digits = getOption("digits"), ...)
             # "| MeanComplexity =", sumryStat[5], 
             "| ValBest =", object@bestfitnessVal,
             "| TstBest =", object@bestfitnessTst,
-            "| ComplexBest =", object@bestcomplexity,"\n"))
+            "| ComplexBest =", object@bestcomplexity,
+            "| Time(min)=", object@minutes_gen,
+            "\n"))
   flush.console()
 }
 
