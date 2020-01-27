@@ -16,6 +16,15 @@ master-slave parallelization.
 Installation
 ------------
 
+Install these packages:
+
+``` {.r}
+install.packages('lhs')
+install.packages('foreach')
+install.packages('parallel')
+install.packages('doParallel') # Only in Windows...
+install.packages('mlbench')
+```
 Get the released version from CRAN:
 
 ``` {.r}
@@ -28,6 +37,7 @@ Or the development version from GitHub:
 # install.packages("devtools")
 devtools::install_github("jpison/GAparsimony")
 ```
+
 
 References
 ----------
