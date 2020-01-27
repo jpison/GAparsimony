@@ -41,30 +41,20 @@ devtools::install_github("jpison/GAparsimony")
 
 References
 ----------
+Martinez-De-Pison, F.J., Gonzalez-Sendino, R., Ferreiro, J., Fraile, E., Pernia-Espinoza, A. GAparsimony: An R package for searching parsimonious models by combining hyperparameter optimization and feature selection (2018) Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics), 10870 LNAI, pp. 62-73. https://doi.org/10.1007/978-3-319-92639-1_6](https://doi.org/10.1007/978-3-319-92639-1_6)
 
-Sanz-Garcia A., Fernandez-Ceniceros J., Antonanzas-Torres F.,
-Pernia-Espinoza A.V., Martinez-de-Pison F.J. (2015). GA-PARSIMONY: A
-GA-SVR approach with feature selection and parameter optimization to
-obtain parsimonious solutions for predicting temperature settings in a
-continuous annealing furnace. Applied Soft Computing 35, 23-38.
+Martinez-de-Pison, F.J., Gonzalez-Sendino, R., Aldama, A., Ferreiro-Cabello, J., Fraile-Garcia, E.
+Hybrid methodology based on Bayesian optimization and GA-PARSIMONY to search for parsimony models by combining hyperparameter optimization and feature selection (2019) Neurocomputing, 354, pp. 20-26. https://doi.org/10.1016/j.neucom.2018.05.136](https://doi.org/10.1016/j.neucom.2018.05.136)
 
-Urraca R., Sodupe-Ortega E., Antonanzas E., Antonanzas-Torres F.,
-Martinez-de-Pison, F.J. (2017). Evaluation of a novel GA-based
-methodology for model structure selection: The GA-PARSIMONY.
-Neurocomputing, Online July 2017.
-[https://doi.org/10.1016/j.neucom.2016.08.154](https://doi.org/10.1016/j.neucom.2016.08.154)
+Urraca R., Sodupe-Ortega E., Antonanzas E., Antonanzas-Torres F., Martinez-de-Pison, F.J. (2017). Evaluation of a novel GA-based
+methodology for model structure selection: The GA-PARSIMONY. Neurocomputing, Online July 2017.[https://doi.org/10.1016/j.neucom.2016.08.154](https://doi.org/10.1016/j.neucom.2016.08.154)
 
-Fernandez-Ceniceros J., Sanz-Garcia A., Antonanzas-Torres F.,
-Martinez-de-Pison F.J. (2015). A numerical-informational approach for
-characterising the ductile behaviour of the T-stub component. Part 2:
-Parsimonious soft-computing-based metamodel. Engineering Structures 82,
-249-260.
+Sanz-Garcia, A., Fernandez-Ceniceros, J., Antonanzas-Torres, F., Pernia-Espinoza, A.V., Martinez-De-Pison, F.J. GA-PARSIMONY: A GA-SVR approach with feature selection and parameter optimization to obtain parsimonious solutions for predicting temperature settings in a continuous annealing furnace (2015) Applied Soft Computing Journal, 35, art. no. 3006, pp. 13-28. [https://doi.org/10.1016/j.asoc.2015.06.012](https://doi.org/10.1016/j.asoc.2015.06.012)
 
-Antonanzas-Torres F., Urraca R., Antonanzas J., Fernandez-Ceniceros J.,
-Martinez-de-Pison F.J. (2015). Generation of daily global solar
-irradiation with support vector machines for regression. Energy
-Conversion and Management 96, 277-286.
+Fernandez-Ceniceros, J., Sanz-Garcia, A., Antoñanzas-Torres, F., Martinez-de-Pison, F.J. A numerical-informational approach for characterising the ductile behaviour of the T-stub component. Part 2: Parsimonious soft-computing-based metamodel
+(2015) Engineering Structures, 82, pp. 249-260. [https://doi.org/10.1016/j.engstruct.2014.06.047](https://doi.org/10.1016/j.engstruct.2014.06.047)
 
+Antonanzas-Torres, F., Urraca, R., Antonanzas, J., Fernandez-Ceniceros, J., Martinez-De-Pison, F.J. Generation of daily global solar irradiation with support vector machines for regression (2015) Energy Conversion and Management, 96, pp. 277-286. [https://doi.org/10.1016/j.enconman.2015.02.086](https://doi.org/10.1016/j.enconman.2015.02.086)
 
 How to use this package
 -----------------------
