@@ -24,6 +24,10 @@ install.packages('foreach')
 install.packages('parallel')
 install.packages('doParallel') # Only in Windows...
 install.packages('mlbench')
+# For the examples
+install.packages('e1071')
+install.packages('nnet')
+install.packages('caret')
 ```
 Get the released version from CRAN:
 
