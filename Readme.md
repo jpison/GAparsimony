@@ -75,6 +75,7 @@ for checking the models’ generalization capability.
 
 ``` {.r}
 # Training and test Datasets
+library(e1071)
 library(caret)
 library(GAparsimony)
 library(mlbench)
@@ -457,6 +458,10 @@ for checking the models’ generalization capability.
 
 ``` {.r}
 # Load Boston database and scale it
+library(nnet)
+library(caret)
+library(GAparsimony)
+library(mlbench)
 library(MASS)
 data(Boston)
 Boston_scaled <- data.frame(scale(Boston))
