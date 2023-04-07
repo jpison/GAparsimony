@@ -21,7 +21,7 @@ parsimony_monitor(object, digits = getOption("digits"), \dots)
 
 %\references{}
 
-\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{http://www.mineriadatos.com}}
+\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{https://edmans.webs.com/}}
 
 %\seealso{\code{\link{ga}}}
 

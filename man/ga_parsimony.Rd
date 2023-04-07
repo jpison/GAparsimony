@@ -98,7 +98,7 @@ Antonanzas-Torres F., Urraca R., Antonanzas J., Fernandez-Ceniceros J., Martinez
 
 }
   
-\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{http://www.mineriadatos.com}}
+\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{https://edmans.webs.com/}}
 
 %\note{}
 
@@ -118,6 +118,7 @@ Antonanzas-Torres F., Urraca R., Antonanzas J., Fernandez-Ceniceros J., Martinez
 
 \examples{
 
+\dontrun{
 #################################
 ### Example 1: Classification ###
 #################################
@@ -200,7 +201,7 @@ names_param <- c("C","sigma")
 # ga_parsimony can be executed with a different set of 'rerank_error' values
 rerank_error <- 0.001
 
-\donttest{
+
 	
 GAparsimony_model <- ga_parsimony(fitness=fitness_SVM,
                                   min_param=min_param, 

@@ -30,7 +30,7 @@ Return a list with two elements:
 }
 
 %\references{}
-\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{http://www.mineriadatos.com}}
+\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{https://edmans.webs.com/}}
 %\note{}
 
 \seealso{\code{\link{ga_parsimony}}}

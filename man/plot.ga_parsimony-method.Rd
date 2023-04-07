@@ -53,7 +53,7 @@ The method invisibly return a list with the elistists validation error, testing 
 
 %\references{}
 
-\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{http://www.mineriadatos.com}}
+\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{https://edmans.webs.com/}}
 
 \keyword{methods}
 \keyword{hplot}

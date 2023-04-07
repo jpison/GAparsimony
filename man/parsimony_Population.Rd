@@ -26,7 +26,7 @@ parsimony_population(object, type_ini_pop="randomLHS", ...)
 
 %\references{}
 
-\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{http://www.mineriadatos.com}}
+\author{Francisco Javier Martinez de Pison. \email{fjmartin@unirioja.es}. EDMANS Group. \url{https://edmans.webs.com/}}
 
 %\note{}
 
